@@ -1,0 +1,44 @@
+{
+  "name": "sy-task-manage",
+  "author": "ccztao",
+  "url": "https://github.com/ccztao/sy-task-manage",
+  "version": "0.2.1",
+  "minAppVersion": "3.1.0",
+  "backends": [
+    "all"
+  ],
+  "frontends": [
+    "all"
+  ],
+  "displayName": {
+    "default": "Task Manager",
+    "zh_CN": "事项管理"
+  },
+  "description": {
+    "default": "A clean task and project manager for SiYuan: tasks bound to blocks, projects, kanban, calendar, Gantt, reminders and optional Mankeep contact mentions.",
+    "zh_CN": "简洁的思源事项与项目管理：任务绑定文档块，支持项目、看板、日历、甘特图、提醒和可选的 Mankeep 联系人提及。"
+  },
+  "readme": {
+    "default": "README.md",
+    "zh_CN": "README_zh_CN.md"
+  },
+  "keywords": [
+    "task",
+    "todo",
+    "project",
+    "kanban",
+    "calendar",
+    "gantt",
+    "reminder",
+    "mankeep",
+    "事项",
+    "任务",
+    "项目",
+    "看板",
+    "日历",
+    "甘特图",
+    "提醒"
+  ],
+  "icon": "icon.png",
+  "preview": "preview.png"
+}

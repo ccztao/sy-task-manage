@@ -1,0 +1,31 @@
+{
+  "name": "sy-task-manage",
+  "version": "0.2.1",
+  "private": true,
+  "type": "module",
+  "description": "SiYuan plugin: Task Manager (tasks, projects, kanban, calendar, Gantt)",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development vite build --watch",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "esbuild test/domain.test.ts --bundle --platform=node --format=esm --outfile=tmp/domain.test.mjs && node --test tmp/domain.test.mjs",
+    "package": "npm run build && node scripts/package.mjs"
+  },
+  "dependencies": {
+    "@fullcalendar/core": "6.1.20",
+    "@fullcalendar/daygrid": "6.1.20",
+    "@fullcalendar/interaction": "6.1.20",
+    "@fullcalendar/list": "6.1.20",
+    "@fullcalendar/timegrid": "6.1.20",
+    "lunar-typescript": "^1.8.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "cross-env": "^7.0.3",
+    "esbuild": "^0.21.5",
+    "sass": "^1.83.0",
+    "siyuan": "1.2.9",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11"
+  }
+}
