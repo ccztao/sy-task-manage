@@ -15,5 +15,5 @@ if (!existsSync(resolve(dist, "plugin.json"))) {
 
 rmSync(release, { recursive: true, force: true });
 mkdirSync(release, { recursive: true });
-execFileSync("zip", ["-qr", archive, "."], { cwd: dist, stdio: "inherit" });
+execFileSync("zip", ["-qr", archive, ".", "-x", ".*", "-x", "*/.*"], { cwd: dist, stdio: "inherit" });
 console.log(`Created ${archive}`);
