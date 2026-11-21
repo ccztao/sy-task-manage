@@ -732,34 +732,61 @@ $kanban-abandoned: #8e8e93;
 .stm-dialog {
     display: flex;
     flex-direction: column;
-    gap: 12px;
-    padding: 16px 16px 8px;
-    max-height: 70vh;
+    gap: 16px;
+    padding: 18px 18px 10px;
+    max-height: 72vh;
     overflow-y: auto;
 }
 
 .stm-dialog-title {
-    font-size: 15px !important;
+    height: 42px;
+    padding: 0 14px !important;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: $surface;
+    font-size: 17px !important;
     font-weight: 600;
-    height: 34px;
-    padding: 0 10px !important;
+    transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+
+    &:focus {
+        outline: none;
+        border-color: $primary;
+        background: $bg;
+        box-shadow: 0 0 0 3px $primary-soft;
+    }
+}
+
+.stm-form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.stm-form-section-title {
+    margin-left: 2px;
+    color: $text-light;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
 }
 
 .stm-form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px 12px;
+    gap: 12px 14px;
 }
 
 .stm-field {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    font-size: 12px;
+    gap: 6px;
+    font-size: 11.5px;
     color: $text-light;
     min-width: 0;
 
     > span {
+        margin-left: 2px;
         font-weight: 500;
     }
 
@@ -768,28 +795,46 @@ $kanban-abandoned: #8e8e93;
     textarea {
         width: 100%;
         box-sizing: border-box;
-        font-size: 12.5px;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        background: $surface;
+        font-size: 13px;
+        transition: border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+            background: $bg;
+            box-shadow: 0 0 0 3px $primary-soft;
+        }
     }
 
     input,
     select {
-        height: 30px;
+        height: 34px;
+        padding: 0 10px !important;
     }
 
     textarea {
         resize: vertical;
         line-height: 1.5;
-        padding: 6px 8px !important;
+        padding: 9px 10px !important;
     }
 }
 
 .stm-field-full {
+    grid-column: 1 / -1;
     width: 100%;
 }
 
+.stm-repeat-extra[hidden] {
+    display: none !important;
+}
+
 .stm-repeat-extra {
-    padding: 8px 10px;
-    border-radius: 8px;
+    margin-top: 2px;
+    padding: 12px;
+    border-radius: 12px;
     background: $surface;
 }
 
@@ -798,8 +843,8 @@ $kanban-abandoned: #8e8e93;
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
-    padding: 8px 10px;
-    border-radius: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
     background: $surface;
     font-size: 12px;
 
@@ -2366,5 +2411,173 @@ input.stm-project-emoji {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+}
+
+
+.stm-dialog + .b3-dialog__action {
+    padding: 10px 18px 14px;
+    border-top: 1px solid $border;
+    gap: 8px;
+}
+
+.stm-dialog + .b3-dialog__action .b3-button {
+    height: 30px;
+    border-radius: 9px;
+    font-size: 12.5px;
+    padding: 0 14px;
+}
+
+.stm-dialog + .b3-dialog__action [data-act="save"] {
+    background: $primary;
+    color: #fff;
+}
+
+.stm-dialog + .b3-dialog__action [data-act="save"]:hover {
+    filter: brightness(1.04);
+}
+
+/* ---------- 自定义时间选择 & 提醒快捷项 ---------- */
+.stm-field select {
+    text-align: center;
+    text-align-last: center;
+}
+
+.stm-field textarea {
+    min-height: 34px;
+    height: 34px;
+    overflow-y: auto;
+}
+
+.stm-reminder-picker {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 5px;
+    width: 100%;
+}
+
+.stm-reminder-quick {
+    flex: 1 1 0;
+    min-width: 0;
+    height: 34px;
+    padding: 0 4px;
+    border: 1px solid transparent;
+    border-radius: 9px;
+    background: $surface;
+    color: $text;
+    font-size: 11.5px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.stm-reminder-quick:hover {
+    background: $hover;
+}
+
+.stm-reminder-quick.is-active {
+    background: $primary;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.stm-reminder-more {
+    flex: 0 0 78px;
+    width: 78px;
+    height: 34px !important;
+    padding: 0 6px !important;
+    font-size: 11.5px;
+}
+
+.stm-time-popup {
+    position: fixed;
+    z-index: 10001;
+    display: flex;
+    gap: 4px;
+    padding: 8px;
+    border: 1px solid $border;
+    border-radius: 13px;
+    background: $bg;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.18);
+}
+
+.stm-time-column {
+    flex: 1;
+    min-width: 0;
+    max-height: 300px;
+    display: flex;
+    flex-direction: column;
+}
+
+.stm-time-column-title {
+    padding: 2px 0 5px;
+    color: $text-light;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.stm-time-list {
+    min-height: 0;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.stm-time-option {
+    display: block;
+    width: 100%;
+    height: 28px;
+    padding: 0;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: $text;
+    font-size: 13px;
+    font-variant-numeric: tabular-nums;
+    text-align: center;
+    cursor: pointer;
+}
+
+.stm-time-option:hover {
+    background: $hover;
+}
+
+.stm-time-option.is-active {
+    background: $primary;
+    color: #fff;
+    font-weight: 600;
+}
+
+.stm-field select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 26px !important;
+    text-align: center;
+    text-align-last: center;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-position: right 9px center;
+    background-size: 12px;
+    background-repeat: no-repeat;
+    background-color: $surface;
+}
+
+.stm-reminder-more {
+    background-color: $surface !important;
+    border: 1px solid $border !important;
+    color: $text !important;
+    text-align: center;
+}
+
+
+@media (max-width: 720px) {
+    .stm-reminder-picker {
+        flex-wrap: wrap;
+    }
+
+    .stm-reminder-quick,
+    .stm-reminder-more {
+        flex: 1 1 calc(50% - 3px);
+        width: auto;
     }
 }

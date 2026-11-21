@@ -31,6 +31,8 @@ export interface Task {
     startTime: string | null;
     endDate: string | null;
     endTime: string | null;
+    /** 提前提醒分钟数；0 表示准时 */
+    reminderOffset: number;
     /** 绑定的思源块或文档 ID */
     blockId: string | null;
     docId: string | null;

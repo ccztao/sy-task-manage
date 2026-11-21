@@ -211,5 +211,17 @@
   "pomodoroStarted": "开始番茄钟：{0}",
   "pomodoroFocusDone": "「{0}」专注完成，休息一下",
   "pomodoroBreakDone": "休息结束：{0}",
-  "pomodoroSessions": "已完成 {0} 个番茄"
+  "pomodoroSessions": "已完成 {0} 个番茄",
+  "startDate": "开始日期",
+  "startTime": "开始时间",
+  "endTime": "结束时间",
+  "reminder": "提醒",
+  "timeAndReminder": "时间与提醒",
+  "detailsSection": "详情",
+  "reminderOnTime": "准时提醒",
+  "reminderBeforeMinutes": "提前 {0} 分钟",
+  "reminder1h": "提前 1 小时",
+  "reminder2h": "提前 2 小时",
+  "reminderMinutesShort": "{0} 分钟",
+  "reminderMore": "更多"
 }

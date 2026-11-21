@@ -34,8 +34,11 @@ export function collectDueEvents(
         for (const date of dates) {
             if (isDoneOn(task, date)) continue;
             const time = task.startTime || settings.defaultReminderTime;
-            const dueMs = toMs(date, time);
-            const key = `${task.id}#${date}#${time}`;
+            const offsetMinutes = task.reminderOffset || 0;
+            const dueMs = toMs(date, time) - offsetMinutes * 60_000;
+            const key = offsetMinutes
+                ? `${task.id}#${date}#${time}#${offsetMinutes}`
+                : `${task.id}#${date}#${time}`;
             if (task.notified?.[key]) continue;
             if (nowMs < dueMs || nowMs - dueMs > catchUpMs) continue;
             out.push({ task, date, time, key, dueMs });

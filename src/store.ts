@@ -14,6 +14,7 @@ export interface NewTaskInput {
     startTime?: string | null;
     endDate?: string | null;
     endTime?: string | null;
+    reminderOffset?: number;
     projectId?: string | null;
     priority?: Task["priority"];
     status?: Task["status"];
@@ -49,6 +50,7 @@ function normalizeTasks(raw: any): Task[] {
             startTime: t.startTime || null,
             endDate: t.endDate || null,
             endTime: t.endTime || null,
+            reminderOffset: typeof t.reminderOffset === "number" && t.reminderOffset >= 0 ? t.reminderOffset : 0,
             completedAt: typeof t.completedAt === "number" ? t.completedAt : null,
             pomodoroCount: typeof t.pomodoroCount === "number" ? t.pomodoroCount : 0,
             pomodoroMinutes: typeof t.pomodoroMinutes === "number" ? t.pomodoroMinutes : 0,
@@ -165,6 +167,7 @@ export class Store {
             startTime: input.startTime || null,
             endDate: input.endDate || null,
             endTime: input.endTime || null,
+            reminderOffset: typeof input.reminderOffset === "number" && input.reminderOffset >= 0 ? input.reminderOffset : 0,
             blockId: input.blockId || null,
             docId: input.docId || null,
             parentId: null,

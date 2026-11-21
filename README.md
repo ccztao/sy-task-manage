@@ -23,7 +23,7 @@ A lightweight task and project manager for [SiYuan](https://b3log.org/siyuan/). 
 - **Kanban** — todo / doing / done / abandoned columns, drag between columns, category and project filtering.
 - **Gantt** — timeline with search, sort, status, project/category and completion-range filters; drag bars to shift dates.
 - **Pomodoro** — start a 25-minute focus timer from a task's clock button, context menu or edit dialog; automatic 5/15-minute breaks, pause/resume, and per-task session counts.
-- **Reminders** — system notifications with per-day de-duplication and restart catch-up.
+- **Reminders** — system notifications with configurable advance time (on time, 5/10/15/30 minutes, 1/2 hours), per-day de-duplication and restart catch-up.
 - **Repeating tasks** — daily/weekly/monthly/yearly with interval and end date.
 - **Import/export** — JSON export/import, plus legacy task-plugin data import.
 - **Privacy mode** — masks task and project names in calendar and kanban.

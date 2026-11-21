@@ -211,5 +211,17 @@
   "pomodoroStarted": "Pomodoro started: {0}",
   "pomodoroFocusDone": "Focus complete for “{0}”. Take a break.",
   "pomodoroBreakDone": "Break finished: {0}",
-  "pomodoroSessions": "{0} pomodoros completed"
+  "pomodoroSessions": "{0} pomodoros completed",
+  "startDate": "Start date",
+  "startTime": "Start time",
+  "endTime": "End time",
+  "reminder": "Reminder",
+  "timeAndReminder": "Time & reminder",
+  "detailsSection": "Details",
+  "reminderOnTime": "On time",
+  "reminderBeforeMinutes": "{0} minutes before",
+  "reminder1h": "1 hour before",
+  "reminder2h": "2 hours before",
+  "reminderMinutesShort": "{0} min",
+  "reminderMore": "More"
 }
