@@ -1706,7 +1706,7 @@ input.stm-project-emoji {
 }
 
 .stm-gantt-corner {
-    width: 220px;
+    width: var(--gantt-label, 220px);
     flex: none;
     position: sticky;
     left: 0;
@@ -1775,7 +1775,7 @@ input.stm-project-emoji {
 }
 
 .stm-gantt-label {
-    width: 220px;
+    width: var(--gantt-label, 220px);
     flex: none;
     position: sticky;
     left: 0;
@@ -2087,4 +2087,284 @@ input.stm-project-emoji {
 .stm-pomodoro-primary {
     background: $primary;
     color: #fff;
+}
+
+/* ---------- 手机端适配 ---------- */
+.stm-mobile-view {
+    height: calc(100vh - 120px);
+    min-height: 0;
+    overflow: hidden;
+}
+
+.stm-mobile-view-dialog .b3-dialog__body {
+    padding: 0 !important;
+}
+
+.stm-mobile-view-dialog .b3-dialog__content {
+    padding: 0 !important;
+    max-height: calc(100vh - 90px);
+    overflow: hidden;
+}
+
+.stm-mobile-view .stm-kanban-root,
+.stm-mobile-view .stm-calendar-root,
+.stm-mobile-view .stm-gantt-root {
+    height: 100%;
+    padding: 8px;
+}
+
+@media (max-width: 720px) {
+    .stm-panel {
+        font-size: 14px;
+    }
+
+    .stm-header {
+        padding: 10px 10px 4px;
+    }
+
+    .stm-heading {
+        font-size: 16px;
+    }
+
+    .stm-view-btn {
+        padding: 5px 10px;
+        font-size: 13px;
+    }
+
+    .stm-filters {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        scrollbar-width: none;
+        padding: 4px 8px 8px;
+    }
+
+    .stm-filters::-webkit-scrollbar {
+        display: none;
+    }
+
+    .stm-filter {
+        flex: 0 0 auto;
+        min-height: 32px;
+        font-size: 13px;
+    }
+
+    .stm-search {
+        margin: 0 8px 8px;
+    }
+
+    .stm-search-input {
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .stm-item {
+        min-height: 54px;
+        padding: 8px 10px;
+    }
+
+    .stm-item-title {
+        font-size: 15px;
+    }
+
+    .stm-item-meta {
+        font-size: 12px;
+    }
+
+    .stm-row-timer {
+        opacity: 0.6;
+        width: 28px;
+        height: 28px;
+    }
+
+    .stm-more {
+        width: 28px;
+        height: 28px;
+    }
+
+    .stm-footer {
+        padding: 4px 6px 6px;
+    }
+
+    .stm-footer-btn {
+        min-height: 38px;
+        font-size: 12px;
+    }
+
+    .stm-kanban-root,
+    .stm-calendar-root,
+    .stm-gantt-root {
+        padding: 8px;
+    }
+
+    .stm-kanban-header,
+    .stm-calendar-header {
+        flex-wrap: wrap;
+        gap: 6px;
+        padding-bottom: 8px;
+    }
+
+    .stm-kanban-title {
+        flex: 1 1 100%;
+        font-size: 16px;
+    }
+
+    .stm-kanban-header .stm-project-select,
+    .stm-calendar-header .stm-project-select {
+        flex: 1 1 120px;
+        width: auto;
+        height: 32px;
+    }
+
+    .stm-kanban-header .stm-btn,
+    .stm-calendar-header .stm-btn {
+        height: 32px;
+    }
+
+    .stm-board {
+        scroll-snap-type: x mandatory;
+        gap: 10px;
+        margin: 0 -8px;
+        padding: 0 8px 6px;
+    }
+
+    .stm-column {
+        flex: 0 0 86vw;
+        min-width: 0;
+        scroll-snap-align: start;
+    }
+
+    .stm-gantt-header {
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 8px;
+    }
+
+    .stm-gantt-search {
+        flex: 1 1 100%;
+        max-width: none;
+        margin: 0;
+    }
+
+    .stm-gantt-controls {
+        width: 100%;
+        margin-left: 0;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        padding-bottom: 2px;
+        scrollbar-width: none;
+    }
+
+    .stm-gantt-controls::-webkit-scrollbar {
+        display: none;
+    }
+
+    .stm-gantt-filter {
+        flex: 0 0 auto;
+        min-width: 0;
+        max-width: none;
+        height: 32px;
+    }
+
+    .stm-gantt-header .stm-btn {
+        flex: 0 0 auto;
+        height: 32px;
+    }
+
+    .stm-gantt-root .stm-gantt-body {
+        margin: 0 -8px;
+    }
+
+    .stm-calendar .fc-toolbar {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .stm-calendar .fc-toolbar-chunk {
+        display: flex;
+        gap: 2px;
+    }
+
+    .stm-calendar .fc-button {
+        padding: 4px 6px;
+        font-size: 11px;
+    }
+
+    .stm-calendar .fc-toolbar-title {
+        font-size: 14px !important;
+    }
+
+    .stm-calendar .fc-event {
+        font-size: 10px;
+        padding: 0 2px;
+    }
+
+    .stm-calendar .fc-daygrid-day-number,
+    .stm-calendar .fc-col-header-cell-cushion {
+        font-size: 10px;
+    }
+
+    .stm-calendar .fc-list-event {
+        font-size: 13px;
+    }
+
+    .stm-pomodoro-widget {
+        left: 10px;
+        right: 10px;
+        bottom: 10px;
+        width: auto;
+    }
+
+    .b3-dialog__action {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .stm-dialog {
+        max-height: calc(100vh - 150px);
+        overflow-y: auto;
+    }
+
+    .stm-settings-dialog .b3-dialog__body,
+    .stm-settings-dialog .b3-dialog__content {
+        width: min(560px, calc(100vw - 20px)) !important;
+    }
+
+    .stm-settings-dialog .b3-dialog__body {
+        max-height: calc(100vh - 120px);
+    }
+}
+
+
+@media (max-width: 720px) {
+    .stm-mobile-view .stm-kanban-title {
+        display: none;
+    }
+
+    .stm-mobile-view .stm-calendar-header > .fn__flex-1 {
+        display: none;
+    }
+
+    .stm-mobile-view .stm-gantt-controls {
+        flex-wrap: wrap;
+        overflow: visible;
+    }
+
+    .stm-mobile-view .stm-gantt-filter {
+        flex: 1 1 calc(50% - 6px);
+    }
+
+    .stm-mobile-view .stm-gantt-range {
+        display: none;
+    }
+
+    .stm-mobile-view .stm-dialog {
+        padding-bottom: 72px;
+    }
+
+    .stm-gantt-name {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 }

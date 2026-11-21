@@ -54,3 +54,10 @@ export function escapeHtml(s: string): string {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;");
 }
+
+/** 对话框宽度：桌面保持原宽度，窄屏自动留出 24px 边距 */
+export function dialogWidth(preferred: number): string {
+    const viewport = typeof window === "undefined" ? preferred : window.innerWidth;
+    const width = Math.min(preferred, Math.max(280, viewport - 24));
+    return `${width}px`;
+}

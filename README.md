@@ -1,3 +1,5 @@
+> 欢迎 QQ 群 1014985431 沟通交流、反馈 bug、提交需求。
+
 # Task Manager for SiYuan (`sy-task-manage`)
 
 A lightweight task and project manager for [SiYuan](https://b3log.org/siyuan/). Tasks are bound to document blocks, so your notes and your calendar stay in sync.

@@ -1,7 +1,7 @@
 import { Dialog, confirm, getActiveEditor, getAllEditor, showMessage } from "siyuan";
 import type STMPlugin from "../index";
 import type { Project } from "../types";
-import { escapeHtml } from "../ui/dom";
+import { dialogWidth, escapeHtml } from "../ui/dom";
 import { getBlockTitle } from "../integration/blockBinding";
 import { openEmojiPicker } from "../ui/emojiPicker";
 
@@ -96,7 +96,7 @@ export class ProjectDialog {
         this.dialog = new Dialog({
             title: project ? t("editProject") : t("newProject"),
             content,
-            width: "500px",
+            width: dialogWidth(500),
             destroyCallback: () => {
                 this.emojiPickerClose?.();
                 this.emojiPickerClose = null;

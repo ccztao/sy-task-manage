@@ -7,6 +7,11 @@ import { icon } from "../ui/icons";
 import { moveBlockUnderDate } from "../integration/dateHeadings";
 
 const LABEL_WIDTH = 220;
+const MOBILE_LABEL_WIDTH = 132;
+
+function ganttLabelWidth(): number {
+    return window.innerWidth <= 720 ? MOBILE_LABEL_WIDTH : LABEL_WIDTH;
+}
 const DAY_WIDTHS = { compact: 20, normal: 28, wide: 40 } as const;
 type Zoom = keyof typeof DAY_WIDTHS;
 
@@ -225,8 +230,10 @@ export class GanttView {
 
         const scroll = h("div", { class: "stm-gantt-scroll" });
         this.scrollEl = scroll;
-        const inner = h("div", { class: "stm-gantt-inner", style: { width: `${LABEL_WIDTH + width}px` } });
+        const labelWidth = ganttLabelWidth();
+        const inner = h("div", { class: "stm-gantt-inner", style: { width: `${labelWidth + width}px` } });
         inner.style.setProperty("--gantt-day", `${dayW}px`);
+        inner.style.setProperty("--gantt-label", `${labelWidth}px`);
 
         const head = h("div", { class: "stm-gantt-head" }, [
             h("div", { class: "stm-gantt-corner", text: t("ganttTaskColumn") }),

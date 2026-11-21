@@ -1,4 +1,4 @@
-import { Dialog, Plugin, Setting, confirm, getAllEditor, showMessage, openTab } from "siyuan";
+import { Dialog, Plugin, Setting, confirm, getAllEditor, platformUtils, showMessage, openTab } from "siyuan";
 import "./styles.scss";
 import { Store } from "./store";
 import type { Settings } from "./types";
@@ -13,6 +13,7 @@ import { ProjectManagerDialog } from "./dialogs/ProjectManagerDialog";
 import { ReminderService } from "./services/reminderService";
 import { PomodoroService } from "./services/pomodoroService";
 import { STM_SYMBOL } from "./ui/icons";
+import { dialogWidth } from "./ui/dom";
 import { registerMenus } from "./integration/menus";
 import { resolveDateForBlock as resolveBlockDate } from "./integration/blockDate";
 import { resolveProjectForBlock as resolveBlockProject } from "./integration/blockProject";
@@ -27,6 +28,14 @@ const DOCK_TYPE = "stm-tasks";
 const KANBAN_TYPE = "kanban";
 const CALENDAR_TYPE = "calendar";
 const GANTT_TYPE = "gantt";
+
+function isMobileUi(): boolean {
+    try {
+        return platformUtils.isInIOS() || platformUtils.isInAndroid() || window.innerWidth <= 720;
+    } catch {
+        return window.innerWidth <= 720;
+    }
+}
 
 export default class STMPlugin extends Plugin {
     store!: Store;
@@ -81,6 +90,7 @@ export default class STMPlugin extends Plugin {
     private blockSyncTimers = new Map<string, number>();
     private blockSyncStop: (() => void) | null = null;
     private pomodoro: PomodoroService | null = null;
+    private mobileViewDialog: Dialog | null = null;
 
     private settingInputs: {
         dock?: HTMLInputElement;
@@ -141,6 +151,8 @@ export default class STMPlugin extends Plugin {
         this.blockSyncStop = null;
         this.pomodoro?.stop();
         this.pomodoro = null;
+        this.mobileViewDialog?.destroy();
+        this.mobileViewDialog = null;
         void contactMentions.stop();
         this.panel?.destroy();
         this.panel = null;
@@ -281,7 +293,32 @@ export default class STMPlugin extends Plugin {
         new ProjectManagerDialog(this).open();
     }
 
+    private openMobileView(kind: "kanban" | "calendar" | "gantt"): void {
+        this.mobileViewDialog?.destroy();
+        const t = this.t;
+        const title = kind === "kanban" ? t("kanbanTitle") : kind === "calendar" ? t("calendarTitle") : t("ganttTitle");
+        let view: KanbanView | CalendarView | GanttView | null = null;
+        const dialog = new Dialog({
+            title,
+            width: dialogWidth(window.innerWidth),
+            content: `<div class="stm-mobile-view"></div>`,
+            destroyCallback: () => {
+                view?.destroy();
+                if (this.mobileViewDialog === dialog) this.mobileViewDialog = null;
+            },
+        });
+        this.mobileViewDialog = dialog;
+        dialog.element.classList.add("stm-mobile-view-dialog");
+        const host = dialog.element.querySelector(".stm-mobile-view") as HTMLElement;
+        view = kind === "kanban" ? new KanbanView(host, this) : kind === "calendar" ? new CalendarView(host, this) : new GanttView(host, this);
+        view.mount();
+    }
+
     openKanban(): void {
+        if (isMobileUi()) {
+            this.openMobileView("kanban");
+            return;
+        }
         void openTab({
             app: this.app,
             custom: {
@@ -294,6 +331,10 @@ export default class STMPlugin extends Plugin {
     }
 
     openCalendar(): void {
+        if (isMobileUi()) {
+            this.openMobileView("calendar");
+            return;
+        }
         void openTab({
             app: this.app,
             custom: {
@@ -306,6 +347,10 @@ export default class STMPlugin extends Plugin {
     }
 
     openGantt(): void {
+        if (isMobileUi()) {
+            this.openMobileView("gantt");
+            return;
+        }
         void openTab({
             app: this.app,
             custom: {
@@ -433,7 +478,7 @@ export default class STMPlugin extends Plugin {
                 }
                 const dialog = new Dialog({
                     title: t("importTitle"),
-                    width: "460px",
+                    width: dialogWidth(460),
                     content: `<div class="b3-dialog__content stm-dialog">
   <p>${t("importSummary", taskCount, projectCount)}</p>
   <p class="stm-import-hint">${t("importHint")}</p>

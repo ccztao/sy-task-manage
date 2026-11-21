@@ -1,7 +1,7 @@
 import { Dialog } from "siyuan";
 import type STMPlugin from "../index";
 import type { Project } from "../types";
-import { h } from "../ui/dom";
+import { h, dialogWidth } from "../ui/dom";
 import { ProjectDialog } from "./ProjectDialog";
 import { categoryColor, groupProjects, projectDateRange, projectStartedDays, projectStatus, type ProjectStatus } from "../domain/projects";
 import { logicalToday } from "../domain/date";
@@ -32,7 +32,7 @@ export class ProjectManagerDialog {
   <div class="fn__flex-1"></div>
   <button class="b3-button b3-button--cancel" data-act="close">${t("close")}</button>
 </div>`,
-            width: "520px",
+            width: dialogWidth(520),
             destroyCallback: () => {
                 this.dialog = null;
                 this.listEl = null;

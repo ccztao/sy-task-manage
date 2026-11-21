@@ -1,7 +1,7 @@
 import { Dialog, confirm, showMessage } from "siyuan";
 import type STMPlugin from "../index";
 import type { Priority, Task, TaskStatus } from "../types";
-import { escapeHtml } from "../ui/dom";
+import { dialogWidth, escapeHtml } from "../ui/dom";
 import { bindTaskToBlock, deleteTaskWithCleanup, syncBlockTitle, unbindBlock } from "../integration/blockBinding";
 import { openBoundBlock } from "../api";
 import { moveBlockUnderDate } from "../integration/dateHeadings";
@@ -148,7 +148,7 @@ export class TaskDialog {
         this.dialog = new Dialog({
             title: task ? t("editTask") : t("newTask"),
             content,
-            width: "560px",
+            width: dialogWidth(560),
             destroyCallback: () => {
                 this.destroyMentions();
                 this.el = null;
