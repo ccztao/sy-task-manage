@@ -2,7 +2,7 @@
   "name": "sy-task-manage",
   "author": "ccztao",
   "url": "https://github.com/ccztao/sy-task-manage",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "minAppVersion": "3.1.0",
   "backends": [
     "all"

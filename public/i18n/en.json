@@ -223,5 +223,7 @@
   "reminder1h": "1 hour before",
   "reminder2h": "2 hours before",
   "reminderMinutesShort": "{0} min",
-  "reminderMore": "More"
+  "reminderMore": "More",
+  "searchProject": "Search projects",
+  "noMatchProject": "No matching projects"
 }

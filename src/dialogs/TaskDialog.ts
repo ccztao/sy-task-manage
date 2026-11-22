@@ -8,6 +8,8 @@ import { moveBlockUnderDate } from "../integration/dateHeadings";
 import { contactMentions } from "../integration/contactMentions";
 import { todayStr } from "../domain/date";
 import { loadContacts } from "../integration/contacts";
+import { groupProjects } from "../domain/projects";
+import { attachProjectPicker } from "../ui/projectPicker";
 import { attachMention } from "../ui/mention";
 import { attachTimePicker } from "../ui/timePicker";
 
@@ -41,6 +43,7 @@ export class TaskDialog {
     private task: Task | null;
     private mentionCleanups: Array<() => void> = [];
     private timePickerCleanups: Array<() => void> = [];
+    private projectPickerCleanups: Array<() => void> = [];
 
     constructor(private plugin: STMPlugin, private options: TaskDialogOptions = {}) {
         this.task = options.task || null;
@@ -69,13 +72,6 @@ export class TaskDialog {
             interval: task?.repeat?.interval || 1,
             until: task?.repeat?.until || "",
         };
-        const projectOptions = [
-            `<option value="">${t("noProject")}</option>`,
-            ...this.plugin.store.projects.map(
-                p => `<option value="${p.id}" ${p.id === defaults.projectId ? "selected" : ""}>${escapeHtml(p.name)}</option>`
-            ),
-        ].join("");
-
         const content = `
 <div class="b3-dialog__content stm-dialog">
   <input class="b3-text-field stm-dialog-title" placeholder="${t("taskTitlePlaceholder")}" value="${escapeHtml(defaults.title)}" spellcheck="false">
@@ -116,7 +112,10 @@ export class TaskDialog {
     <div class="stm-form-grid">
       <label class="stm-field">
         <span>${t("project")}</span>
-        <select class="b3-select" data-field="project">${projectOptions}</select>
+        <div class="stm-project-combo">
+          <input class="b3-text-field stm-project-display" readonly value="${escapeHtml(defaults.projectId ? (this.plugin.store.getProject(defaults.projectId)?.name || "") : t("noProject"))}" placeholder="${t("noProject")}">
+          <input type="hidden" data-field="project" value="${escapeHtml(defaults.projectId)}">
+        </div>
       </label>
       <label class="stm-field">
         <span>${t("priority")}</span>
@@ -185,6 +184,7 @@ export class TaskDialog {
             destroyCallback: () => {
                 this.destroyMentions();
                 for (const cleanup of this.timePickerCleanups.splice(0)) cleanup();
+                for (const cleanup of this.projectPickerCleanups.splice(0)) cleanup();
                 this.el = null;
                 this.dialog = null;
             },
@@ -194,6 +194,16 @@ export class TaskDialog {
         this.setupMentions();
         for (const input of Array.from(this.el.querySelectorAll<HTMLInputElement>("[data-time-picker]"))) {
             this.timePickerCleanups.push(attachTimePicker(input));
+        }
+        const projectDisplay = this.q<HTMLInputElement>(".stm-project-display");
+        const projectHidden = this.q<HTMLInputElement>('[data-field="project"]');
+        if (projectDisplay && projectHidden) {
+            this.projectPickerCleanups.push(attachProjectPicker(
+                projectDisplay,
+                projectHidden,
+                () => groupProjects(this.plugin.store.projects),
+                t
+            ));
         }
         const titleInput = this.el.querySelector<HTMLInputElement>(".stm-dialog-title");
         if (titleInput) {

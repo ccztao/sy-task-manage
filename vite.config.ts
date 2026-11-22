@@ -1,6 +1,6 @@
 import { defineConfig } from "vite";
 import { resolve } from "node:path";
-import { copyFileSync, existsSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync } from "node:fs";
 
 const outDir = "dist";
 const packageFiles = ["plugin.json", "README.md", "README_zh_CN.md", "LICENSE"];
@@ -13,6 +13,8 @@ function copyPackageFiles() {
                 const source = resolve(__dirname, file);
                 if (existsSync(source)) copyFileSync(source, resolve(outDir, file));
             }
+            const screenshots = resolve(__dirname, "screenshots");
+            if (existsSync(screenshots)) cpSync(screenshots, resolve(outDir, "screenshots"), { recursive: true });
         },
     };
 }

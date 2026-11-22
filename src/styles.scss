@@ -2581,3 +2581,122 @@ input.stm-project-emoji {
         width: auto;
     }
 }
+
+/* ---------- 可搜索项目选择器 ---------- */
+.stm-project-combo {
+    position: relative;
+    width: 100%;
+}
+
+.stm-project-display {
+    cursor: pointer;
+    text-align: center;
+    padding-right: 26px !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' fill='none' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") !important;
+    background-position: right 9px center !important;
+    background-size: 12px !important;
+    background-repeat: no-repeat !important;
+    background-color: $surface !important;
+}
+
+.stm-project-popup {
+    position: fixed;
+    z-index: 10002;
+    display: flex;
+    flex-direction: column;
+    max-height: 330px;
+    overflow: hidden;
+    border: 1px solid $border;
+    border-radius: 12px;
+    background: $bg;
+    box-shadow: 0 12px 34px rgba(0, 0, 0, 0.18);
+}
+
+.stm-project-popup-head {
+    padding: 7px;
+    border-bottom: 1px solid $border;
+}
+
+.stm-project-search {
+    width: 100%;
+    height: 32px !important;
+    padding: 0 9px !important;
+    border: 1px solid transparent !important;
+    border-radius: 8px !important;
+    background: $surface !important;
+    font-size: 12px !important;
+}
+
+.stm-project-search:focus {
+    outline: none;
+    border-color: $primary !important;
+    background: $bg !important;
+    box-shadow: 0 0 0 2px $primary-soft;
+}
+
+.stm-project-picker-list {
+    min-height: 0;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.stm-project-picker-group {
+    padding: 6px 8px 3px;
+    color: $text-light;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+}
+
+.stm-project-picker-option {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    height: 32px;
+    padding: 0 8px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: $text;
+    font-size: 12px;
+    text-align: left;
+    cursor: pointer;
+}
+
+.stm-project-picker-option:hover {
+    background: $hover;
+}
+
+.stm-project-picker-option.is-active {
+    background: $primary;
+    color: #fff;
+}
+
+.stm-project-picker-option-dot {
+    width: 7px;
+    height: 7px;
+    flex: none;
+    border-radius: 50%;
+}
+
+.stm-project-no-icon {
+    width: 14px;
+    flex: none;
+    text-align: center;
+    color: $text-light;
+}
+
+.stm-project-picker-option-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.stm-project-picker-empty {
+    padding: 18px 8px;
+    color: $text-light;
+    font-size: 12px;
+    text-align: center;
+}

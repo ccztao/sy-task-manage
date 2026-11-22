@@ -195,8 +195,34 @@ export class CalendarView {
         this.unsub = this.plugin.store.onChange(() => {
             this.renderProjectOptions();
             this.syncPrivacyButton();
-            this.calendar?.refetchEvents();
+            this.preserveScroll(() => this.calendar?.refetchEvents());
         });
+    }
+
+    /** refetchEvents 会重建日历 DOM，保留当前滚动位置，避免完成/取消完成时页面跳动 */
+    private preserveScroll(action: () => void): void {
+        const targets = new Map<HTMLElement, number>();
+        const remember = (el: HTMLElement | null | undefined) => {
+            if (!el || targets.has(el)) return;
+            targets.set(el, el.scrollTop);
+        };
+        remember(this.container);
+        this.container?.querySelectorAll<HTMLElement>(".fc-scroller").forEach(el => remember(el));
+        let parent = this.container?.parentElement || null;
+        for (let i = 0; i < 6 && parent; i++, parent = parent.parentElement) {
+            if (parent.scrollHeight > parent.clientHeight + 10) remember(parent);
+        }
+        remember(document.scrollingElement as HTMLElement | null);
+        const before = targets;
+        action();
+        const restore = () => {
+            for (const [el, top] of before) {
+                if (top > 0) el.scrollTop = top;
+            }
+        };
+        requestAnimationFrame(restore);
+        window.setTimeout(restore, 30);
+        window.setTimeout(restore, 120);
     }
 
     /** 页签可能是在隐藏状态下恢复的，等容器有尺寸后再渲染，避免日历被压成 0 宽 */
@@ -426,6 +452,7 @@ export class CalendarView {
         check.addEventListener("click", ev => {
             ev.preventDefault();
             ev.stopPropagation();
+            check.blur();
             this.toggleOccurrence(taskId, date);
         });
         wrap.append(check);

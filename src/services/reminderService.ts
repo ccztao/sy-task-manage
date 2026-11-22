@@ -1,3 +1,4 @@
+import { showMessage } from "siyuan";
 import type { Store } from "../store";
 import type { T } from "../i18n";
 import { formatDateHuman, logicalToday } from "../domain/date";
@@ -81,7 +82,10 @@ export class ReminderService {
                     .filter(Boolean)
                     .join(" · ");
                 store.markNotified(event.task.id, event.key);
-                await sendReminderNotification(t("notifyTitle"), `${event.task.title}${body ? `\n${body}` : ""}`);
+                const message = `${event.task.title}${body ? `\n${body}` : ""}`;
+                await sendReminderNotification(t("notifyTitle"), message);
+                // 系统通知可能被系统设置静默，保留一个应用内反馈
+                showMessage(`${t("notifyTitle")} · ${event.task.title}`, 7000, "info");
             }
             void this.ctx.app;
         } catch (err) {

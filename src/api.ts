@@ -92,7 +92,6 @@ export async function sendReminderNotification(title: string, body: string): Pro
     } catch (err) {
         console.warn("[stm] web notification failed", err);
     }
-    showMessage(`${title} · ${body}`, 6000, "info");
     return false;
 }
 

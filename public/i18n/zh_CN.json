@@ -223,5 +223,7 @@
   "reminder1h": "提前 1 小时",
   "reminder2h": "提前 2 小时",
   "reminderMinutesShort": "{0} 分钟",
-  "reminderMore": "更多"
+  "reminderMore": "更多",
+  "searchProject": "搜索项目",
+  "noMatchProject": "没有匹配的项目"
 }
