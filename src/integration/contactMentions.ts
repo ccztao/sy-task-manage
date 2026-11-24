@@ -31,7 +31,7 @@ export function mentionLink(contactId: string, name: string): string {
 /** 匹配正文里的纯文本 @姓名，避开链接标签和已经转换过的引用 */
 export function plainMentionPattern(name: string): RegExp {
     const n = escapeRegex(name);
-    return new RegExp(`(?<![\\w"@\\u4e00-\\u9fa5\\[])@${n}(?![\\w"\\u4e00-\\u9fa5\\]])`, "g");
+    return new RegExp(`(?<![\\w"@\\[])@${n}(?![\\w"\\u4e00-\\u9fa5\\]])`, "g");
 }
 
 /** 把块引用或旧链接统一替换为普通链接，并更新名字 */
@@ -189,7 +189,7 @@ class ContactMentionRegistry {
     async migrateDocument(rootId: string): Promise<number> {
         if (!this.plugin || !rootId) return 0;
         try {
-            const contacts = (await loadContacts()).slice().sort((a, b) => b.name.length - a.name.length);
+            const contacts = (await loadContacts(true)).slice().sort((a, b) => b.name.length - a.name.length);
             if (!contacts.length) return 0;
             const rows = await api<Array<{ id: string }>>("/api/query/sql", {
                 stmt: `SELECT id FROM blocks WHERE root_id = '${rootId.replace(/'/g, "''")}' AND content LIKE '%@%' AND type IN ('p','h','i','l','t','b','s')`,
@@ -243,7 +243,7 @@ class ContactMentionRegistry {
     /** 把某个块里新输入的纯文本 @姓名 重新变成联系人链接（编辑标题后调用） */
     async linkifyBlock(blockId: string): Promise<number> {
         try {
-            const contacts = (await loadContacts()).slice().sort((a, b) => b.name.length - a.name.length);
+            const contacts = (await loadContacts(true)).slice().sort((a, b) => b.name.length - a.name.length);
             if (!contacts.length) return 0;
             const data = await api<{ kramdown: string }>("/api/block/getBlockKramdown", { id: blockId });
             let kramdown = data?.kramdown || "";

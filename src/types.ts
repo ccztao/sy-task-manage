@@ -45,6 +45,8 @@ export interface Task {
     pomodoroCount: number;
     /** 累计番茄钟专注分钟数 */
     pomodoroMinutes: number;
+    /** 每日番茄次数：YYYY-MM-DD -> count */
+    pomodoroHistory: Record<string, number>;
     /** 重复事项按“ occurrences 日期 ”记录完成状态 */
     instances: Record<string, TaskInstance>;
     /** 已发送提醒记录：key -> 时间戳 */

@@ -84,6 +84,7 @@ export class TaskPanel {
             const rect = moreBtn.getBoundingClientRect();
             showMenu(
                 [
+                    menuItem(t("statistics"), "iconChart", () => this.plugin.openStatistics()),
                     menuItem(t("importData"), "iconDownload", () => this.plugin.openImportDialog()),
                     menuItem(t("importLegacy"), "iconDownload", () => void this.plugin.openLegacyImport()),
                     menuItem(t("exportData"), "iconUpload", () => this.plugin.exportData()),
@@ -93,8 +94,14 @@ export class TaskPanel {
             );
         });
 
+        const statsBtn = h("button", {
+            class: "stm-stats-entry",
+            title: t("statistics"),
+            html: `${icon("stats", 15)}<span>${t("statistics")}</span>`,
+        });
+        statsBtn.addEventListener("click", () => this.plugin.openStatistics());
         const header = h("div", { class: "stm-header" }, [
-            h("div", { class: "stm-heading", text: t("panelTitle") }),
+            statsBtn,
             switchEl,
             h("div", { class: "stm-header-actions" }, [this.addBtn, moreBtn]),
         ]);

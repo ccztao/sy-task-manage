@@ -98,9 +98,14 @@ export class PomodoroService {
         }
         if (this.state.phase === "focus") {
             const nextCount = (task.pomodoroCount || 0) + 1;
+            const now = new Date();
+            const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+            const history = { ...(task.pomodoroHistory || {}) };
+            history[dateKey] = (history[dateKey] || 0) + 1;
             this.plugin.store.updateTask(task.id, {
                 pomodoroCount: nextCount,
                 pomodoroMinutes: (task.pomodoroMinutes || 0) + 25,
+                pomodoroHistory: history,
             });
             const long = nextCount % 4 === 0;
             const duration = long ? LONG_MS : SHORT_MS;

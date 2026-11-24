@@ -10,6 +10,7 @@ import { GanttView } from "./views/GanttView";
 import { TaskDialog, type TaskDialogOptions } from "./dialogs/TaskDialog";
 import { ProjectDialog } from "./dialogs/ProjectDialog";
 import { ProjectManagerDialog } from "./dialogs/ProjectManagerDialog";
+import { StatisticsDialog } from "./dialogs/StatisticsDialog";
 import { ReminderService } from "./services/reminderService";
 import { PomodoroService } from "./services/pomodoroService";
 import { STM_SYMBOL } from "./ui/icons";
@@ -231,6 +232,8 @@ export default class STMPlugin extends Plugin {
         if (!blockId) return false;
         this.store.updateTask(task.id, { blockId });
         await bindTaskToBlock(task.id, blockId, task.startDate);
+        // 新建块里的 @姓名 也要转成联系人链接
+        await contactMentions.linkifyBlock(blockId);
         return true;
     }
 
@@ -287,6 +290,10 @@ export default class STMPlugin extends Plugin {
 
     openProjectDialog(project?: import("./types").Project | null): void {
         new ProjectDialog(this, project || null).open();
+    }
+
+    openStatistics(): void {
+        new StatisticsDialog(this).open();
     }
 
     openProjectManager(): void {

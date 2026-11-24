@@ -1,6 +1,6 @@
 {
   "name": "sy-task-manage",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "private": true,
   "type": "module",
   "description": "SiYuan plugin: Task Manager (tasks, projects, kanban, calendar, Gantt)",

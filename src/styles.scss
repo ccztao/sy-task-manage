@@ -2700,3 +2700,381 @@ input.stm-project-emoji {
     font-size: 12px;
     text-align: center;
 }
+
+/* ---------- 统计入口与统计弹窗 ---------- */
+.stm-stats-entry {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 5px;
+    height: 28px;
+    padding: 0 9px;
+    white-space: nowrap;
+    border: none;
+    border-radius: 8px;
+    background: $surface;
+    color: $text-light;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.stm-stats-entry:hover {
+    background: $hover;
+    color: $text;
+}
+
+.stm-stats-entry .stm-svg {
+    color: $primary;
+}
+
+.stm-stats-dialog {
+    gap: 14px;
+}
+
+.stm-stats-tabs {
+    display: flex;
+    gap: 3px;
+    padding: 3px;
+    border-radius: 10px;
+    background: $surface;
+}
+
+.stm-stats-tab {
+    flex: 1;
+    height: 32px;
+    border: none;
+    border-radius: 7px;
+    background: transparent;
+    color: $text-light;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.stm-stats-tab.is-active {
+    background: $primary;
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.stm-stats-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.stm-stat-cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.stm-stat-card {
+    padding: 13px 14px;
+    border-radius: 12px;
+    background: $surface;
+    border: 1px solid transparent;
+}
+
+.stm-stat-card.is-blue {
+    background: rgba(0, 122, 255, 0.08);
+    border-color: rgba(0, 122, 255, 0.14);
+}
+
+.stm-stat-card.is-green {
+    background: rgba(52, 199, 89, 0.09);
+    border-color: rgba(52, 199, 89, 0.16);
+}
+
+.stm-stat-card.is-red {
+    background: rgba(255, 59, 48, 0.075);
+    border-color: rgba(255, 59, 48, 0.14);
+}
+
+.stm-stat-card.is-purple {
+    background: rgba(124, 92, 243, 0.08);
+    border-color: rgba(124, 92, 243, 0.15);
+}
+
+.stm-stat-label {
+    color: $text-light;
+    font-size: 11px;
+}
+
+.stm-stat-value {
+    margin-top: 5px;
+    color: $text;
+    font-size: 25px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+}
+
+.stm-stat-panel {
+    padding: 14px;
+    border-radius: 12px;
+    background: $surface;
+}
+
+.stm-stat-panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    color: $text;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.stm-stat-panel-head strong {
+    color: $primary;
+    font-size: 18px;
+}
+
+.stm-stat-progress {
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: $bg;
+}
+
+.stm-stat-progress span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: $primary;
+}
+
+.stm-stat-sub {
+    margin-top: 8px;
+    color: $text-light;
+    font-size: 11px;
+}
+
+.stm-stat-bars {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    height: 130px;
+    padding-top: 8px;
+}
+
+.stm-stat-bar {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    min-width: 0;
+}
+
+.stm-stat-bar-fill {
+    width: 100%;
+    max-width: 38px;
+    border-radius: 6px 6px 2px 2px;
+    background: $primary;
+    opacity: 0.78;
+}
+
+.stm-stat-bar span {
+    color: $text-light;
+    font-size: 10px;
+}
+
+.stm-stat-bar em {
+    color: $text;
+    font-size: 11px;
+    font-style: normal;
+}
+
+.stm-stat-project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.stm-stat-project-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    font-size: 12px;
+}
+
+.stm-stat-dot {
+    width: 8px;
+    height: 8px;
+    flex: none;
+    border-radius: 50%;
+}
+
+.stm-stat-project-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.stm-stat-project-meta {
+    flex: none;
+    color: $text-light;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+}
+
+.stm-stat-project-bar {
+    flex: 0 0 90px;
+    height: 5px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: $bg;
+}
+
+.stm-stat-project-bar i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+}
+
+.stm-stat-empty {
+    padding: 20px;
+    color: $text-light;
+    font-size: 12px;
+    text-align: center;
+}
+
+@media (max-width: 720px) {
+    .stm-stat-cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .stm-stat-project-bar {
+        flex-basis: 50px;
+    }
+
+    .stm-stats-entry span {
+        display: none;
+    }
+}
+
+.stm-heatmap-panel {
+    overflow: hidden;
+}
+
+.stm-heatmap-range {
+    width: auto;
+    min-width: 82px;
+    height: 28px;
+    padding: 0 8px;
+    font-size: 11px;
+}
+
+.stm-heatmap-scroll {
+    overflow-x: auto;
+    padding: 2px 1px 4px;
+    scrollbar-width: thin;
+}
+
+.stm-heatmap-grid {
+    display: flex;
+    gap: 3px;
+    width: max-content;
+}
+
+.stm-heatmap-week {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.stm-heatmap-cell {
+    display: block;
+    width: 11px;
+    height: 11px;
+    flex: none;
+    border-radius: 2px;
+    background: $bg;
+}
+
+.stm-heatmap-cell.is-empty {
+    background: transparent;
+}
+
+.stm-heatmap-task .stm-heatmap-cell.is-level-1 { background: #cdebdc; }
+.stm-heatmap-task .stm-heatmap-cell.is-level-2 { background: #8ed8ae; }
+.stm-heatmap-task .stm-heatmap-cell.is-level-3 { background: #4cbd7c; }
+.stm-heatmap-task .stm-heatmap-cell.is-level-4 { background: #248a4d; }
+
+.stm-heatmap-pomodoro .stm-heatmap-cell.is-level-1 { background: #f6d2c7; }
+.stm-heatmap-pomodoro .stm-heatmap-cell.is-level-2 { background: #eda78f; }
+.stm-heatmap-pomodoro .stm-heatmap-cell.is-level-3 { background: #e07d5f; }
+.stm-heatmap-pomodoro .stm-heatmap-cell.is-level-4 { background: #b95336; }
+
+.stm-heatmap-legend {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 4px;
+    margin-top: 3px;
+    color: $text-light;
+    font-size: 10px;
+}
+
+.stm-heatmap-legend i {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+}
+
+.stm-heatmap-legend .is-level-1 { background: #cdebdc; }
+.stm-heatmap-legend .is-level-2 { background: #8ed8ae; }
+.stm-heatmap-legend .is-level-3 { background: #4cbd7c; }
+.stm-heatmap-legend .is-level-4 { background: #248a4d; }
+
+.stm-heatmap-pomodoro .stm-heatmap-legend .is-level-1 { background: #f6d2c7; }
+.stm-heatmap-pomodoro .stm-heatmap-legend .is-level-2 { background: #eda78f; }
+.stm-heatmap-pomodoro .stm-heatmap-legend .is-level-3 { background: #e07d5f; }
+.stm-heatmap-pomodoro .stm-heatmap-legend .is-level-4 { background: #b95336; }
+
+.stm-heatmap-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.stm-heatmap-project {
+    width: auto;
+    max-width: 150px;
+    min-width: 90px;
+    height: 28px;
+    padding: 0 7px;
+    font-size: 11px;
+}
+
+.stm-heatmap-months {
+    display: grid;
+    column-gap: 3px;
+    margin: 2px 0 4px;
+    color: $text-light;
+    font-size: 10px;
+    line-height: 14px;
+}
+
+.stm-heatmap-months span {
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.stm-heatmap-panel .stm-stat-panel-head {
+    gap: 8px;
+    flex-wrap: wrap;
+}

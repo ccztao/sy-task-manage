@@ -382,11 +382,11 @@ export class TaskDialog {
             if (effectiveStatus === "abandoned") patch.completedAt = null;
             this.plugin.store.updateTask(this.task.id, patch);
             if (boundBlockId) {
-                if (previousTitle !== title) {
-                    void syncBlockTitle(boundBlockId, previousTitle, title).then(ok => {
-                        if (ok) void contactMentions.linkifyBlock(boundBlockId);
-                    });
-                }
+                const titleSync = previousTitle !== title
+                    ? syncBlockTitle(boundBlockId, previousTitle, title)
+                    : Promise.resolve(false);
+                // 即使标题没变，也重新把标题里的纯文本 @姓名 转成联系人链接
+                void titleSync.then(() => contactMentions.linkifyBlock(boundBlockId));
                 if (date && previousDate !== date) {
                     void moveBlockUnderDate(boundBlockId, date, this.plugin.store.settings.dateHeadingLevel);
                 }
@@ -408,7 +408,7 @@ export class TaskDialog {
                 repeat,
             });
             if (task.blockId) {
-                void bindTaskToBlock(task.id, task.blockId, task.startDate);
+                void bindTaskToBlock(task.id, task.blockId, task.startDate).then(() => contactMentions.linkifyBlock(task.blockId!));
             } else if (this.options.source) {
                 void this.plugin.insertCreatedTask(task.id);
             }

@@ -41,6 +41,7 @@ Tasks are bound to blocks in your document. The document is the source of truth;
 - **Auto calendar** — new checklist items under a date heading become tasks automatically; H5/H6 headings can be enabled in settings.
 - **Reminders** — on time, 5/10/15/30 minutes before, or 1/2 hours before; notifications are de-duplicated per day.
 - **Pomodoro** — 25-minute focus sessions with automatic 5/15-minute breaks, pause/resume and per-task counts.
+- **Statistics** — a “Statistics” entry in the sidebar with task, project and pomodoro summaries; task completion and pomodoro heatmaps support 30 days, 90 days, 6 months and 12 months, default to 12 months, and can be filtered by project.
 - **Repeating tasks** — daily, weekly, monthly or yearly with interval and end date.
 - **Import/export** — JSON backup and legacy task-plugin import.
 - **Privacy mode** — masks task and project names in calendar and kanban.
