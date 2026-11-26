@@ -181,6 +181,7 @@ export class GanttView {
         const today = logicalToday(store.settings.dayStartTime);
         const projects = new Map(store.projects.map(p => [p.id, p]));
         let tasks = store.tasks.filter(task => {
+            if (task.parentId) return false;
             if (!task.startDate && !task.endDate) return false;
             if (this.query && !task.title.toLowerCase().includes(this.query)) return false;
             if (this.status !== "all" && task.status !== this.status) return false;

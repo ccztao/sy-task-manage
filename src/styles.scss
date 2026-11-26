@@ -1907,26 +1907,6 @@ input.stm-project-emoji {
     display: none;
 }
 
-.stm-footer-settings {
-    flex: none;
-    width: 30px;
-    height: 28px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    border-radius: 6px;
-    background: transparent;
-    color: $text-light;
-    cursor: pointer;
-    padding: 0;
-}
-
-.stm-footer-settings:hover {
-    background: $hover;
-    color: $text;
-}
-
 .stm-gantt-row.is-done .stm-gantt-name,
 .stm-gantt-row.is-done .stm-gantt-range {
     color: #9aa0a6;
@@ -3077,4 +3057,330 @@ input.stm-project-emoji {
 .stm-heatmap-panel .stm-stat-panel-head {
     gap: 8px;
     flex-wrap: wrap;
+}
+
+/* ---------- 快速添加 ---------- */
+.stm-quick-add {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 30px;
+    margin: 0 0 8px;
+    padding: 0 8px;
+    border: 1px dashed $border;
+    border-radius: 8px;
+    color: $text-light;
+    background: transparent;
+}
+
+.stm-quick-add:focus-within {
+    border-color: $primary;
+    background: $surface;
+}
+
+.stm-quick-icon {
+    display: inline-flex;
+    flex: none;
+    opacity: 0.65;
+}
+
+.stm-quick-add .stm-quick-input {
+    flex: 1;
+    min-width: 0;
+    height: 24px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-size: 12px;
+    box-shadow: none;
+}
+
+.stm-quick-dialog .stm-quick-input {
+    height: 36px;
+    font-size: 14px;
+}
+
+.stm-quick-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.stm-quick-project {
+    height: 30px;
+    max-width: 180px;
+    font-size: 12px;
+}
+
+.stm-quick-hint {
+    flex: 1;
+    color: $text-light;
+    font-size: 11px;
+}
+
+/* ---------- 子任务 ---------- */
+.stm-subtask-section {
+    margin-top: 2px;
+}
+
+.stm-subtask-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.stm-subtask-row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 27px;
+    padding: 2px 4px;
+    border-radius: 6px;
+}
+
+.stm-subtask-row:hover {
+    background: $hover;
+}
+
+.stm-subtask-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 12px;
+}
+
+.stm-subtask-title.is-done {
+    color: $text-light;
+    text-decoration: line-through;
+}
+
+.stm-subtask-more {
+    display: inline-flex;
+    flex: none;
+    padding: 3px;
+    border: none;
+    background: transparent;
+    color: $text-light;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.stm-subtask-row:hover .stm-subtask-more {
+    opacity: 1;
+}
+
+.stm-subtask-add {
+    display: flex;
+    gap: 6px;
+}
+
+.stm-subtask-add input {
+    flex: 1;
+    height: 30px;
+    font-size: 12px;
+}
+
+.stm-subtask-add-btn {
+    height: 30px;
+    font-size: 12px;
+}
+
+.stm-subtask-empty {
+    padding: 4px 2px;
+    color: $text-light;
+    font-size: 11px;
+}
+
+.stm-subtask-badge {
+    color: $primary;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 表格视图 ---------- */
+.stm-table-root {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    padding: 14px 16px 16px;
+    box-sizing: border-box;
+    background: $bg;
+}
+
+.stm-table-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 12px;
+}
+
+.stm-table-search {
+    width: 220px;
+    margin: 0;
+}
+
+.stm-table-filter {
+    width: 145px;
+    height: 28px;
+    font-size: 12px;
+}
+
+.stm-table-scroll {
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+    border: 1px solid $border;
+    border-radius: 10px;
+    background: $surface;
+}
+
+.stm-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+    font-size: 12px;
+}
+
+.stm-table th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 9px 10px;
+    border-bottom: 1px solid $border;
+    background: $surface;
+    color: $text-light;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: left;
+}
+
+.stm-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid $border;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: $text;
+}
+
+.stm-table tr:last-child td {
+    border-bottom: none;
+}
+
+.stm-table-row {
+    cursor: pointer;
+}
+
+.stm-table-row:hover td {
+    background: $hover;
+}
+
+.stm-table-row.is-done .stm-table-title,
+.stm-table-row.is-abandoned .stm-table-title {
+    color: $text-light;
+    text-decoration: line-through;
+}
+
+.stm-table-check {
+    width: 34px;
+    text-align: center !important;
+}
+
+.stm-table-title {
+    width: 30%;
+    font-weight: 500;
+}
+
+.stm-table-date {
+    width: 15%;
+    color: $text-light;
+}
+
+.stm-table-project,
+.stm-table-priority {
+    color: $text-light;
+}
+
+.stm-table-link {
+    margin-left: 4px;
+    color: $primary;
+    vertical-align: -1px;
+}
+
+.stm-table-empty {
+    padding: 60px 20px;
+    color: $text-light;
+    font-size: 12px;
+    text-align: center;
+}
+
+.stm-table-bulk[hidden] {
+    display: none !important;
+}
+
+.stm-table-bulk {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 5px 8px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background: $primary-soft;
+}
+
+.stm-bulk-count {
+    flex: none;
+    color: $primary;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.stm-bulk-select {
+    width: 130px;
+    height: 28px;
+    font-size: 11px;
+}
+
+.stm-bulk-date {
+    width: 128px;
+    height: 28px;
+    font-size: 11px;
+}
+
+.stm-table-bulk .b3-button {
+    height: 28px;
+    padding: 0 8px;
+    font-size: 11px;
+}
+
+.stm-bulk-delete {
+    color: $error;
+}
+
+.stm-card-subtasks {
+    margin-top: 3px;
+    color: $primary;
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+}
+
+.stm-subtask-actions:empty {
+    display: none;
+}
+
+.stm-subtask-actions {
+    margin-top: 5px;
+}
+
+.stm-subtask-sync {
+    height: 28px;
+    font-size: 11px;
 }

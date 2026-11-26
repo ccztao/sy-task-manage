@@ -1,5 +1,5 @@
 import type { Store } from "../store";
-import { api, getBlockAttrs, getBlockRow, setBlockAttrs } from "../api";
+import { api, deleteBlock, getBlockAttrs, getBlockRow, getChildBlocks, setBlockAttrs } from "../api";
 import { deleteBlockTree } from "./dateHeadings";
 
 export const TASK_ATTR = "custom-stm-task-id";
@@ -43,6 +43,10 @@ export async function getBlockTitle(blockId: string): Promise<string> {
 /** 删除事项并清理块上的绑定属性 */
 export async function deleteTaskWithCleanup(store: Store, taskId: string): Promise<void> {
     const task = store.getTask(taskId);
+    if (!task) return;
+    for (const child of store.tasks.filter(x => x.parentId === taskId)) {
+        await deleteTaskWithCleanup(store, child.id);
+    }
     if (task?.blockId) {
         const row = await getBlockRow(task.blockId);
         if (row && row.type !== "d") {
@@ -52,6 +56,20 @@ export async function deleteTaskWithCleanup(store: Store, taskId: string): Promi
         }
     }
     store.deleteTask(taskId);
+    if (task.parentId) {
+        const parent = store.getTask(task.parentId);
+        if (parent?.subtaskListId) {
+            const items = await getChildBlocks(parent.subtaskListId);
+            if (!items.length) {
+                try {
+                    await deleteBlock(parent.subtaskListId);
+                } catch {
+                    /* ignore */
+                }
+                store.updateTask(parent.id, { subtaskListId: null });
+            }
+        }
+    }
 }
 
 function stripKramdownAttrs(kramdown: string): string {

@@ -321,6 +321,7 @@ export class CalendarView {
             return { bg: muted.bg, fg: muted.fg, border: muted.border };
         };
         for (const task of store.tasks) {
+            if (task.parentId) continue;
             if (task.status === "abandoned") continue;
             const project = store.getProject(task.projectId);
             if (this.category !== null && (project?.category || "") !== this.category) continue;

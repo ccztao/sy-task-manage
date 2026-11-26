@@ -113,6 +113,7 @@ export class KanbanView {
 
         this.boardEl.innerHTML = "";
         const tasks = store.tasks.filter(task => {
+            if (task.parentId) return false;
             const project = store.getProject(task.projectId);
             if (this.category !== null && (project?.category || "") !== this.category) return false;
             if (this.projectId && task.projectId !== this.projectId) return false;
@@ -196,6 +197,11 @@ export class KanbanView {
         const privacy = !!this.plugin.store.settings.privacyMode;
         const title = h("div", { class: "stm-card-title", text: privacy ? maskText(task.title) : task.title });
         card.append(title);
+        const children = this.plugin.store.tasks.filter(x => x.parentId === task.id);
+        if (children.length) {
+            const doneCount = children.filter(x => !!x.completedAt).length;
+            card.append(h("div", { class: "stm-card-subtasks", text: `☑ ${doneCount}/${children.length}` }));
+        }
         if (task.completedAt) {
             card.append(h("span", { class: "stm-card-done-badge", text: t("completedBadge") }));
         } else if (abandoned) {

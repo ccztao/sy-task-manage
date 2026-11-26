@@ -37,6 +37,8 @@ export interface Task {
     blockId: string | null;
     docId: string | null;
     parentId: string | null;
+    /** 子任务列表块 ID（父事项使用） */
+    subtaskListId?: string | null;
     sort: number;
     repeat: RepeatRule | null;
     /** 非重复事项的完成时间 */

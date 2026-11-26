@@ -7,10 +7,12 @@ import { TaskPanel } from "./views/TaskPanel";
 import { KanbanView } from "./views/KanbanView";
 import { CalendarView } from "./views/CalendarView";
 import { GanttView } from "./views/GanttView";
+import { TableView } from "./views/TableView";
 import { TaskDialog, type TaskDialogOptions } from "./dialogs/TaskDialog";
 import { ProjectDialog } from "./dialogs/ProjectDialog";
 import { ProjectManagerDialog } from "./dialogs/ProjectManagerDialog";
 import { StatisticsDialog } from "./dialogs/StatisticsDialog";
+import { QuickAddDialog } from "./dialogs/QuickAddDialog";
 import { ReminderService } from "./services/reminderService";
 import { PomodoroService } from "./services/pomodoroService";
 import { STM_SYMBOL } from "./ui/icons";
@@ -29,6 +31,7 @@ const DOCK_TYPE = "stm-tasks";
 const KANBAN_TYPE = "kanban";
 const CALENDAR_TYPE = "calendar";
 const GANTT_TYPE = "gantt";
+const TABLE_TYPE = "table";
 
 function isMobileUi(): boolean {
     try {
@@ -296,6 +299,10 @@ export default class STMPlugin extends Plugin {
         new StatisticsDialog(this).open();
     }
 
+    openQuickAdd(projectId: string | null = null): void {
+        new QuickAddDialog(this, projectId).open();
+    }
+
     openProjectManager(): void {
         new ProjectManagerDialog(this).open();
     }
@@ -364,6 +371,18 @@ export default class STMPlugin extends Plugin {
                 id: this.name + GANTT_TYPE,
                 icon: "iconSTM",
                 title: this.t("ganttTitle"),
+                data: {},
+            },
+        });
+    }
+
+    openTable(): void {
+        void openTab({
+            app: this.app,
+            custom: {
+                id: this.name + TABLE_TYPE,
+                icon: "iconSTM",
+                title: this.t("tableTitle"),
                 data: {},
             },
         });
@@ -570,6 +589,20 @@ export default class STMPlugin extends Plugin {
         });
 
         this.addTab({
+            type: TABLE_TYPE,
+            init: tab => {
+                const view = new TableView(tab.element as HTMLElement, this);
+                view.mount();
+                this.tabViews.set(tab, view);
+            },
+            destroy: function (this: any) {
+                const view = pluginRef.tabViews.get(this);
+                view?.destroy();
+                pluginRef.tabViews.delete(this);
+            } as any,
+        });
+
+        this.addTab({
             type: GANTT_TYPE,
             init: tab => {
                 const view = new GanttView(tab.element as HTMLElement, this);
@@ -611,6 +644,11 @@ export default class STMPlugin extends Plugin {
             callback: () => this.openTaskDialog({ date: this.today() }),
         });
         this.addCommand({
+            langKey: "cmdQuickAdd",
+            hotkey: "⌥⌘N",
+            callback: () => this.openQuickAdd(),
+        });
+        this.addCommand({
             langKey: "cmdSetDocAsTask",
             hotkey: "",
             editorCallback: protyle => {
@@ -640,6 +678,11 @@ export default class STMPlugin extends Plugin {
             langKey: "cmdOpenCalendar",
             hotkey: "",
             callback: () => this.openCalendar(),
+        });
+        this.addCommand({
+            langKey: "cmdOpenTable",
+            hotkey: "",
+            callback: () => this.openTable(),
         });
         this.addCommand({
             langKey: "cmdImportData",

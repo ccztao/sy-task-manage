@@ -33,6 +33,9 @@ Tasks are bound to blocks in your document. The document is the source of truth;
 ## Features
 
 - **Tasks and projects** — create, edit, complete, abandon and search tasks; group projects by category.
+- **Quick add** — type a title in the sidebar and press Enter; natural dates such as “tomorrow 10:00” are supported.
+- **Table view** — manage tasks in a table with multi-select, bulk complete/reopen, bulk project/date changes and bulk delete.
+- **Subtasks** — add subtasks inside a task with progress; when the parent is bound to a document block, subtasks become a task list under the parent block and stay in sync with document checkboxes.
 - **Block binding** — bind any block to a task. Editing the bound block or moving it under another date heading updates the task and all views.
 - **Document integration** — calendar/kanban task creation writes a block under the date heading; deleting a task cleans up its block and empty headings.
 - **Calendar** — month, week and list views; lunar dates; drag to reschedule, resize multi-day tasks, complete from an event.

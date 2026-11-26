@@ -21,6 +21,7 @@ export interface NewTaskInput {
     note?: string;
     blockId?: string | null;
     docId?: string | null;
+    parentId?: string | null;
     repeat?: Task["repeat"];
 }
 
@@ -171,7 +172,8 @@ export class Store {
             reminderOffset: typeof input.reminderOffset === "number" && input.reminderOffset >= 0 ? input.reminderOffset : 0,
             blockId: input.blockId || null,
             docId: input.docId || null,
-            parentId: null,
+            parentId: input.parentId || null,
+            subtaskListId: null,
             sort: maxSort + 1,
             repeat: input.repeat || null,
             completedAt: null,

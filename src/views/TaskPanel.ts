@@ -4,6 +4,7 @@ import type { Project, Task, TaskItem } from "../types";
 import type { Filter } from "../domain/tasks";
 import { collectAll, collectCompleted, collectToday, collectUpcoming, countFor, groupItems } from "../domain/tasks";
 import { formatDateHuman, formatRelativeTime, logicalToday } from "../domain/date";
+import { parseQuickAdd } from "../domain/quickAdd";
 import { categoryColor, groupProjects, projectDateRange, projectStartedDays, projectStatus } from "../domain/projects";
 import { h } from "../ui/dom";
 import { icon } from "../ui/icons";
@@ -19,6 +20,8 @@ export class TaskPanel {
     private filtersEl!: HTMLElement;
     private searchWrap!: HTMLElement;
     private searchInput!: HTMLInputElement;
+    private quickWrap!: HTMLElement;
+    private quickInput!: HTMLInputElement;
     private addBtn!: HTMLButtonElement;
     private viewButtons = new Map<PanelView, HTMLElement>();
     private filter: Filter = "today";
@@ -135,21 +138,32 @@ export class TaskPanel {
             this.render();
         });
 
+        this.quickWrap = h("div", { class: "stm-quick-add" }, [
+            h("span", { class: "stm-quick-icon", html: icon("plus", 13) }),
+            h("input", { class: "b3-text-field stm-quick-input", attrs: { placeholder: t("quickAddPlaceholderShort") } }),
+        ]);
+        this.quickInput = this.quickWrap.querySelector("input") as HTMLInputElement;
+        this.quickInput.addEventListener("keydown", ev => {
+            if (ev.key === "Enter" && !ev.isComposing) {
+                ev.preventDefault();
+                this.createQuickTask();
+            }
+        });
+
         this.listEl = h("div", { class: "stm-body" });
 
-        const settingsBtn = h("button", { class: "stm-footer-settings", html: icon("settings", 16), title: t("settings") });
-        settingsBtn.addEventListener("click", () => this.plugin.openSettings());
         const footer = h("div", { class: "stm-footer" }, [
-            settingsBtn,
             h("button", { class: "stm-footer-btn", html: `${icon("board", 15)}<span>${t("kanban")}</span>` }),
             h("button", { class: "stm-footer-btn", html: `${icon("calendar", 15)}<span>${t("calendar")}</span>` }),
             h("button", { class: "stm-footer-btn", html: `${icon("gantt", 15)}<span>${t("gantt")}</span>` }),
+            h("button", { class: "stm-footer-btn", html: `${icon("table", 15)}<span>${t("table")}</span>` }),
         ]);
-        footer.children[1].addEventListener("click", () => this.plugin.openKanban());
-        footer.children[2].addEventListener("click", () => this.plugin.openCalendar());
-        footer.children[3].addEventListener("click", () => this.plugin.openGantt());
+        footer.children[0].addEventListener("click", () => this.plugin.openKanban());
+        footer.children[1].addEventListener("click", () => this.plugin.openCalendar());
+        footer.children[2].addEventListener("click", () => this.plugin.openGantt());
+        footer.children[3].addEventListener("click", () => this.plugin.openTable());
 
-        this.root.append(header, this.filtersEl, this.searchWrap, this.listEl, footer);
+        this.root.append(header, this.filtersEl, this.searchWrap, this.quickWrap, this.listEl, footer);
         this.applyView();
     }
 
@@ -167,7 +181,24 @@ export class TaskPanel {
         }
         this.filtersEl.hidden = this.view !== "tasks";
         this.searchWrap.hidden = this.view !== "tasks";
+        this.quickWrap.hidden = this.view !== "tasks";
         this.addBtn.title = this.view === "projects" ? t("newProject") : t("newTask");
+    }
+
+    private createQuickTask(): void {
+        const value = this.quickInput.value.trim();
+        if (!value) return;
+        const parsed = parseQuickAdd(value, this.today);
+        const task = this.plugin.store.createTask({
+            title: parsed.title,
+            startDate: parsed.date,
+            startTime: parsed.time,
+        });
+        void this.plugin.store.flush();
+        this.quickInput.value = "";
+        this.filter = "all";
+        showMessage(this.plugin.t("quickAddCreated", task.title), 2500, "info");
+        this.render();
     }
 
     private onAdd(): void {
@@ -188,7 +219,7 @@ export class TaskPanel {
     private renderTasks(): void {
         const t = this.plugin.t;
         const store = this.plugin.store;
-        const all = store.tasks;
+        const all = store.tasks.filter(x => !x.parentId);
 
         for (const btn of Array.from(this.filtersEl.querySelectorAll<HTMLElement>(".stm-filter"))) {
             const key = btn.dataset.filter as Filter;
@@ -390,6 +421,11 @@ export class TaskPanel {
         });
 
         const meta: HTMLElement[] = [];
+        const children = this.plugin.store.tasks.filter(x => x.parentId === task.id);
+        if (children.length) {
+            const doneChildren = children.filter(x => !!x.completedAt).length;
+            meta.push(h("span", { class: "stm-subtask-badge", text: `☑ ${doneChildren}/${children.length}` }));
+        }
         if (item.done) meta.push(h("span", { class: "stm-done-badge", text: t("completedBadge") }));
         if (project) {
             meta.push(

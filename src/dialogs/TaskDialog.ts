@@ -1,17 +1,20 @@
 import { Dialog, confirm, showMessage } from "siyuan";
 import type STMPlugin from "../index";
 import type { Priority, Task, TaskStatus } from "../types";
-import { dialogWidth, escapeHtml } from "../ui/dom";
+import { dialogWidth, escapeHtml, h } from "../ui/dom";
 import { bindTaskToBlock, deleteTaskWithCleanup, syncBlockTitle, unbindBlock } from "../integration/blockBinding";
 import { openBoundBlock } from "../api";
 import { moveBlockUnderDate } from "../integration/dateHeadings";
 import { contactMentions } from "../integration/contactMentions";
+import { attachSubtaskBlock, pruneSubtaskList, syncExistingSubtasks, syncSubtaskCheckbox } from "../integration/subtasks";
 import { todayStr } from "../domain/date";
 import { loadContacts } from "../integration/contacts";
 import { groupProjects } from "../domain/projects";
 import { attachProjectPicker } from "../ui/projectPicker";
 import { attachMention } from "../ui/mention";
 import { attachTimePicker } from "../ui/timePicker";
+import { showMenu, menuItem } from "../ui/menu";
+import { icon } from "../ui/icons";
 
 export interface TaskDialogOptions {
     task?: Task;
@@ -153,6 +156,19 @@ export class TaskDialog {
         <input class="b3-text-field" type="date" data-field="until" value="${defaults.until}">
       </label>
     </div>
+    ${
+      task && !task.parentId
+        ? `<div class="stm-form-section stm-subtask-section">
+    <div class="stm-form-section-title">${t("subtasks")}</div>
+    <div class="stm-subtask-list" data-subtask-list></div>
+    <div class="stm-subtask-actions" data-subtask-actions></div>
+    <div class="stm-subtask-add">
+      <input class="b3-text-field" data-subtask-input placeholder="${t("subtaskPlaceholder")}" spellcheck="false">
+      <button type="button" class="b3-button b3-button--outline stm-subtask-add-btn" data-act="add-subtask">${t("addSubtask")}</button>
+    </div>
+  </div>`
+        : ""
+  }
     <label class="stm-field stm-field-full">
       <span>${t("note")}</span>
       <textarea class="b3-text-field fn__block" rows="1" data-field="note" placeholder="${t("notePlaceholder")}">${escapeHtml(defaults.note)}</textarea>
@@ -191,6 +207,7 @@ export class TaskDialog {
         });
         this.el = this.dialog.element;
         this.bind();
+        this.renderSubtasks();
         this.setupMentions();
         for (const input of Array.from(this.el.querySelectorAll<HTMLInputElement>("[data-time-picker]"))) {
             this.timePickerCleanups.push(attachTimePicker(input));
@@ -253,6 +270,15 @@ export class TaskDialog {
 
         el.querySelector('[data-act="cancel"]')?.addEventListener("click", () => this.close());
         el.querySelector('[data-act="save"]')?.addEventListener("click", () => this.save());
+        el.querySelector('[data-act="add-subtask"]')?.addEventListener("click", () => this.addSubtask());
+        el.querySelector('[data-act="sync-subtasks"]')?.addEventListener("click", () => void this.syncSubtasks());
+        const subtaskInput = el.querySelector<HTMLInputElement>("[data-subtask-input]");
+        subtaskInput?.addEventListener("keydown", ev => {
+            if (ev.key === "Enter" && !ev.isComposing) {
+                ev.preventDefault();
+                this.addSubtask();
+            }
+        });
         el.querySelector('[data-act="delete"]')?.addEventListener("click", () => this.deleteTask());
         el.querySelector('[data-act="open-block"]')?.addEventListener("click", () => {
             if (this.task?.blockId) openBoundBlock(this.plugin.app, this.task.blockId);
@@ -263,6 +289,106 @@ export class TaskDialog {
             this.plugin.startPomodoro(this.task.id);
             this.close();
         });
+    }
+
+    private renderSubtasks(): void {
+        if (!this.el || !this.task) return;
+        const list = this.el.querySelector<HTMLElement>("[data-subtask-list]");
+        if (!list) return;
+        const children = this.plugin.store.tasks.filter(x => x.parentId === this.task?.id);
+        const t = this.plugin.t;
+        list.innerHTML = "";
+        const actions = this.el.querySelector<HTMLElement>("[data-subtask-actions]");
+        if (actions) {
+            actions.innerHTML = "";
+            if (this.task.blockId && children.some(x => !x.blockId)) {
+                const sync = h("button", { class: "b3-button b3-button--outline stm-subtask-sync", attrs: { "data-act": "sync-subtasks" }, text: t("syncSubtasks") });
+                sync.addEventListener("click", () => void this.syncSubtasks());
+                actions.append(sync);
+            }
+        }
+        if (!children.length) {
+            list.append(h("div", { class: "stm-subtask-empty", text: t("subtaskEmpty") }));
+            return;
+        }
+        for (const child of children) {
+            const row = h("div", { class: "stm-subtask-row" });
+            const check = h("button", {
+                class: `stm-check${child.completedAt ? " is-checked" : ""}`,
+                attrs: { "aria-label": t("toggleDone") },
+                html: icon("check", 11),
+            });
+            check.addEventListener("click", () => {
+                this.plugin.store.setDone(child.id, null);
+                const updated = this.plugin.store.getTask(child.id);
+                if (updated) void syncSubtaskCheckbox(updated);
+                this.renderSubtasks();
+            });
+            const title = h("span", { class: `stm-subtask-title${child.completedAt ? " is-done" : ""}`, text: child.title });
+            title.addEventListener("click", () => this.plugin.openTaskDialog({ task: child }));
+            const more = h("button", { class: "stm-subtask-more", html: icon("more", 14), title: t("more") });
+            more.addEventListener("click", ev => {
+                ev.stopPropagation();
+                const rect = more.getBoundingClientRect();
+                showMenu([
+                    menuItem(t("edit"), "iconEdit", () => {
+                        this.close();
+                        this.plugin.openTaskDialog({ task: child });
+                    }),
+                    menuItem(t("delete"), "iconTrashcan", () => {
+                        const remove = () => {
+                            void deleteTaskWithCleanup(this.plugin.store, child.id).then(async () => {
+                                await pruneSubtaskList(this.plugin.store, this.task!.id);
+                                this.renderSubtasks();
+                            });
+                        };
+                        if (this.plugin.store.settings.confirmDelete) {
+                            confirm(t("deleteSubtaskTitle"), t("confirmDelete"), remove);
+                        } else {
+                            remove();
+                        }
+                    }),
+                ], { x: rect.right, y: rect.bottom });
+            });
+            row.append(check, title, more);
+            list.append(row);
+        }
+    }
+
+    private async addSubtask(): Promise<void> {
+        if (!this.el || !this.task) return;
+        const input = this.el.querySelector<HTMLInputElement>("[data-subtask-input]");
+        const title = input?.value.trim();
+        if (!title) return;
+        const child = this.plugin.store.createTask({
+            title,
+            parentId: this.task.id,
+            projectId: this.task.projectId,
+            startDate: this.task.startDate,
+        });
+        if (this.task.blockId) {
+            try {
+                const blockId = await attachSubtaskBlock(this.plugin.store, this.task, child, title);
+                if (!blockId) showMessage(this.plugin.t("subtaskLocalOnly"), 3500, "info");
+            } catch (err) {
+                console.warn("[stm] add subtask block failed", err);
+                showMessage(this.plugin.t("subtaskLocalOnly"), 3500, "info");
+            }
+        } else {
+            showMessage(this.plugin.t("subtaskNeedBind"), 3500, "info");
+        }
+        await this.plugin.store.flush();
+        if (input) input.value = "";
+        this.renderSubtasks();
+        input?.focus();
+    }
+
+    private async syncSubtasks(): Promise<void> {
+        if (!this.task) return;
+        const count = await syncExistingSubtasks(this.plugin.store, this.task);
+        await this.plugin.store.flush();
+        showMessage(this.plugin.t("subtasksSynced", count), 3000, "info");
+        this.renderSubtasks();
     }
 
     private setupMentions(): void {
@@ -380,16 +506,17 @@ export class TaskDialog {
                 patch.completedAt = null;
             }
             if (effectiveStatus === "abandoned") patch.completedAt = null;
-            this.plugin.store.updateTask(this.task.id, patch);
+            const updated = this.plugin.store.updateTask(this.task.id, patch);
             if (boundBlockId) {
                 const titleSync = previousTitle !== title
                     ? syncBlockTitle(boundBlockId, previousTitle, title)
                     : Promise.resolve(false);
                 // 即使标题没变，也重新把标题里的纯文本 @姓名 转成联系人链接
                 void titleSync.then(() => contactMentions.linkifyBlock(boundBlockId));
-                if (date && previousDate !== date) {
+                if (!this.task.parentId && date && previousDate !== date) {
                     void moveBlockUnderDate(boundBlockId, date, this.plugin.store.settings.dateHeadingLevel);
                 }
+                if (this.task.parentId && updated) void syncSubtaskCheckbox(updated);
             }
         } else {
             const task = this.plugin.store.createTask({
