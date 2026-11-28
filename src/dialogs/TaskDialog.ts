@@ -6,7 +6,7 @@ import { bindTaskToBlock, deleteTaskWithCleanup, syncBlockTitle, unbindBlock } f
 import { openBoundBlock } from "../api";
 import { moveBlockUnderDate } from "../integration/dateHeadings";
 import { contactMentions } from "../integration/contactMentions";
-import { attachSubtaskBlock, pruneSubtaskList, syncExistingSubtasks, syncSubtaskCheckbox } from "../integration/subtasks";
+import { attachSubtaskBlock, convertParentToHeading, pruneSubtaskList, syncExistingSubtasks, syncSubtaskCheckbox } from "../integration/subtasks";
 import { todayStr } from "../domain/date";
 import { loadContacts } from "../integration/contacts";
 import { groupProjects } from "../domain/projects";
@@ -47,6 +47,7 @@ export class TaskDialog {
     private mentionCleanups: Array<() => void> = [];
     private timePickerCleanups: Array<() => void> = [];
     private projectPickerCleanups: Array<() => void> = [];
+    private pendingSubtasks: string[] = [];
 
     constructor(private plugin: STMPlugin, private options: TaskDialogOptions = {}) {
         this.task = options.task || null;
@@ -157,9 +158,9 @@ export class TaskDialog {
       </label>
     </div>
     ${
-      task && !task.parentId
+      !task || !task.parentId
         ? `<div class="stm-form-section stm-subtask-section">
-    <div class="stm-form-section-title">${t("subtasks")}</div>
+    <div class="stm-form-section-title stm-subtask-title-row"><span>${t("subtasks")}</span>${task ? `<span class="stm-subtask-convert-actions"><span class="stm-subtask-convert-label">${t("convertParentHeading")}</span><button type="button" class="stm-subtask-convert" data-act="convert-parent-h5">H5</button><button type="button" class="stm-subtask-convert" data-act="convert-parent-h6">H6</button></span>` : ""}</div>
     <div class="stm-subtask-list" data-subtask-list></div>
     <div class="stm-subtask-actions" data-subtask-actions></div>
     <div class="stm-subtask-add">
@@ -272,6 +273,8 @@ export class TaskDialog {
         el.querySelector('[data-act="save"]')?.addEventListener("click", () => this.save());
         el.querySelector('[data-act="add-subtask"]')?.addEventListener("click", () => this.addSubtask());
         el.querySelector('[data-act="sync-subtasks"]')?.addEventListener("click", () => void this.syncSubtasks());
+        el.querySelector('[data-act="convert-parent-h5"]')?.addEventListener("click", () => void this.convertParent(5));
+        el.querySelector('[data-act="convert-parent-h6"]')?.addEventListener("click", () => void this.convertParent(6));
         const subtaskInput = el.querySelector<HTMLInputElement>("[data-subtask-input]");
         subtaskInput?.addEventListener("keydown", ev => {
             if (ev.key === "Enter" && !ev.isComposing) {
@@ -291,10 +294,38 @@ export class TaskDialog {
         });
     }
 
+    private async convertParent(level: 5 | 6): Promise<void> {
+        if (!this.task?.blockId) {
+            showMessage(this.plugin.t("subtaskNeedBind"), 3000, "info");
+            return;
+        }
+        const ok = await convertParentToHeading(this.plugin.store, this.task, level);
+        showMessage(this.plugin.t(ok ? "convertedParentHeading" : "convertParentHeadingFailed"), 3000, ok ? "info" : "error");
+    }
+
     private renderSubtasks(): void {
-        if (!this.el || !this.task) return;
+        if (!this.el) return;
         const list = this.el.querySelector<HTMLElement>("[data-subtask-list]");
         if (!list) return;
+        if (!this.task) {
+            list.innerHTML = "";
+            if (!this.pendingSubtasks.length) {
+                list.append(h("div", { class: "stm-subtask-empty", text: this.plugin.t("subtaskEmpty") }));
+                return;
+            }
+            this.pendingSubtasks.forEach((title, index) => {
+                const row = h("div", { class: "stm-subtask-row" });
+                row.append(h("span", { class: "stm-subtask-pending-dot" }), h("span", { class: "stm-subtask-title", text: title }));
+                const remove = h("button", { class: "stm-subtask-more", html: icon("close", 12), title: this.plugin.t("delete") });
+                remove.addEventListener("click", () => {
+                    this.pendingSubtasks.splice(index, 1);
+                    this.renderSubtasks();
+                });
+                row.append(remove);
+                list.append(row);
+            });
+            return;
+        }
         const children = this.plugin.store.tasks.filter(x => x.parentId === this.task?.id);
         const t = this.plugin.t;
         list.innerHTML = "";
@@ -356,10 +387,17 @@ export class TaskDialog {
     }
 
     private async addSubtask(): Promise<void> {
-        if (!this.el || !this.task) return;
+        if (!this.el) return;
         const input = this.el.querySelector<HTMLInputElement>("[data-subtask-input]");
         const title = input?.value.trim();
         if (!title) return;
+        if (!this.task) {
+            this.pendingSubtasks.push(title);
+            if (input) input.value = "";
+            this.renderSubtasks();
+            input?.focus();
+            return;
+        }
         const child = this.plugin.store.createTask({
             title,
             parentId: this.task.id,
@@ -534,11 +572,27 @@ export class TaskDialog {
                 docId: this.options.docId || null,
                 repeat,
             });
-            if (task.blockId) {
-                void bindTaskToBlock(task.id, task.blockId, task.startDate).then(() => contactMentions.linkifyBlock(task.blockId!));
-            } else if (this.options.source) {
-                void this.plugin.insertCreatedTask(task.id);
-            }
+            const pending = [...this.pendingSubtasks];
+            const setupParent = async () => {
+                if (task.blockId) {
+                    await bindTaskToBlock(task.id, task.blockId, task.startDate);
+                    await contactMentions.linkifyBlock(task.blockId);
+                } else if (this.options.source) {
+                    await this.plugin.insertCreatedTask(task.id);
+                }
+                const parent = this.plugin.store.getTask(task.id);
+                for (const subtitle of pending) {
+                    const child = this.plugin.store.createTask({
+                        title: subtitle,
+                        parentId: task.id,
+                        projectId: task.projectId,
+                        startDate: task.startDate,
+                    });
+                    if (parent?.blockId) await attachSubtaskBlock(this.plugin.store, parent, child, subtitle);
+                }
+                await this.plugin.store.flush();
+            };
+            void setupParent();
         }
         this.close();
     }

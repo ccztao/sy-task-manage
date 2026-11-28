@@ -101,6 +101,9 @@ function normalizeSettings(raw: any): Settings {
         autoTaskHeadingLevel: ["h5", "h6", "both"].includes(raw.autoTaskHeadingLevel)
             ? raw.autoTaskHeadingLevel
             : "off",
+        subtaskParentHeading: ["h5", "h6"].includes(raw.subtaskParentHeading)
+            ? raw.subtaskParentHeading
+            : "auto",
         calendarColorMode: raw.calendarColorMode === "vivid" ? "vivid" : "muted",
         privacyMode: !!raw.privacyMode,
     };

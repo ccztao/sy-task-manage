@@ -440,13 +440,23 @@ export class CalendarView {
         const taskId = arg.event.extendedProps.taskId as string;
         const date = arg.event.extendedProps.date as string;
         const done = !!arg.event.extendedProps.done;
+        const task = this.plugin.store.getTask(taskId);
+        const children = task ? this.plugin.store.tasks.filter(x => x.parentId === task.id) : [];
+        const doneChildren = children.filter(x => !!x.completedAt).length;
         const wrap = document.createElement("div");
         wrap.className = "stm-fc-event";
         const check = document.createElement("button");
         check.type = "button";
-        check.className = `stm-fc-check${done ? " is-checked" : ""}`;
+        check.className = `stm-fc-check${done ? " is-checked" : ""}${children.length ? " has-subtasks" : ""}`;
+        if (children.length) {
+            const percent = Math.round((doneChildren / children.length) * 100);
+            check.style.setProperty("--stm-progress", `${percent}%`);
+            check.title = `${t("toggleDone")} · ${doneChildren}/${children.length}`;
+            check.setAttribute("aria-label", `${t("subtasks")} ${doneChildren}/${children.length}`);
+        } else {
+            check.title = t("toggleDone");
+        }
         check.innerHTML = icon("check", 10);
-        check.title = t("toggleDone");
         const stop = (ev: Event) => ev.stopPropagation();
         check.addEventListener("pointerdown", stop);
         check.addEventListener("mousedown", stop);

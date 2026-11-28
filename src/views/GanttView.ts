@@ -255,6 +255,18 @@ export class GanttView {
             const label = h("div", { class: "stm-gantt-label", title: task.title }, [
                 h("span", { class: "stm-gantt-dot", style: { background: project?.color || "#9aa0a6" } }),
                 h("span", { class: "stm-gantt-name", text: task.title }),
+                (() => {
+                    const children = this.plugin.store.tasks.filter(x => x.parentId === task.id);
+                    if (!children.length) return h("span");
+                    const doneChildren = children.filter(x => !!x.completedAt).length;
+                    const percent = Math.round((doneChildren / children.length) * 100);
+                    const badge = h("span", { class: "stm-gantt-progress" }, [
+                        h("span", { class: "stm-subtask-ring" }),
+                        h("span", { text: `${doneChildren}/${children.length}` }),
+                    ]);
+                    badge.style.setProperty("--stm-subtask-progress", `${percent}%`);
+                    return badge;
+                })(),
                 h("span", { class: "stm-gantt-range", text: task.startDate ? `${start}${task.endDate ? " → " + end : ""}` : end }),
             ]);
             label.addEventListener("click", () => this.plugin.openTaskDialog({ task }));

@@ -1,4 +1,4 @@
-import { Dialog, Plugin, Setting, confirm, getAllEditor, platformUtils, showMessage, openTab } from "siyuan";
+import { Dialog, Plugin, confirm, getAllEditor, platformUtils, showMessage, openTab } from "siyuan";
 import "./styles.scss";
 import { Store } from "./store";
 import type { Settings } from "./types";
@@ -12,6 +12,7 @@ import { TaskDialog, type TaskDialogOptions } from "./dialogs/TaskDialog";
 import { ProjectDialog } from "./dialogs/ProjectDialog";
 import { ProjectManagerDialog } from "./dialogs/ProjectManagerDialog";
 import { StatisticsDialog } from "./dialogs/StatisticsDialog";
+import { SettingsDialog } from "./dialogs/SettingsDialog";
 import { QuickAddDialog } from "./dialogs/QuickAddDialog";
 import { ReminderService } from "./services/reminderService";
 import { PomodoroService } from "./services/pomodoroService";
@@ -96,20 +97,6 @@ export default class STMPlugin extends Plugin {
     private pomodoro: PomodoroService | null = null;
     private mobileViewDialog: Dialog | null = null;
 
-    private settingInputs: {
-        dock?: HTMLInputElement;
-        notifications?: HTMLInputElement;
-        reminderTime?: HTMLInputElement;
-        dayStart?: HTMLInputElement;
-        weekStart?: HTMLSelectElement;
-        dateHeadingLevel?: HTMLSelectElement;
-        autoTaskFromList?: HTMLInputElement;
-        autoTaskHeadingLevel?: HTMLSelectElement;
-        calendarColorMode?: HTMLSelectElement;
-        privacyMode?: HTMLInputElement;
-        showCompleted?: HTMLInputElement;
-        confirmDelete?: HTMLInputElement;
-    } = {};
 
     async onload(): Promise<void> {
         this.t = createT(this.i18n);
@@ -124,7 +111,6 @@ export default class STMPlugin extends Plugin {
         this.registerTabs();
         this.registerCommands();
         this.menuCleanups = registerMenus(this);
-        this.buildSetting();
 
         this.reminder = new ReminderService({ store: this.store, t: this.t, app: this.app });
         this.reminder.start();
@@ -251,39 +237,12 @@ export default class STMPlugin extends Plugin {
     }
 
     openSettings(): void {
-        try {
-            this.setting?.open(this.t("settingsTitle"));
-            window.setTimeout(() => {
-                const title = this.t("settingsTitle");
-                const dialog = Array.from(document.querySelectorAll(".b3-dialog")).find(
-                    d => d.querySelector(".b3-dialog__header")?.textContent?.trim() === title
-                );
-                if (!dialog) return;
-                dialog.classList.add("stm-settings-dialog");
-                dialog.querySelectorAll<HTMLElement>(".config-item").forEach(item => {
-                    item.style.setProperty("flex-direction", "row", "important");
-                    item.style.setProperty("align-items", "center", "important");
-                    item.style.setProperty("justify-content", "space-between", "important");
-                    const grow = item.querySelector<HTMLElement>(".fn__flex-1, .fn__block");
-                    if (grow) {
-                        grow.style.setProperty("flex", "1 1 0%", "important");
-                        grow.style.setProperty("width", "0", "important");
-                        grow.style.minWidth = "0";
-                    }
-                    const space = item.querySelector<HTMLElement>(".fn__space");
-                    if (space) space.style.display = "none";
-                    const hr = item.querySelector<HTMLElement>(".fn__hr");
-                    if (hr) hr.style.display = "none";
-                    const control = item.querySelector<HTMLElement>("input, select");
-                    if (control) {
-                        control.style.marginLeft = "auto";
-                        control.style.flex = "0 0 auto";
-                    }
-                });
-            }, 80);
-        } catch (err) {
-            console.warn("[stm] open settings failed", err);
-        }
+        new SettingsDialog(this).open();
+    }
+
+    /** 集市插件卡片上的齿轮设置入口 */
+    openSetting(): void {
+        this.openSettings();
     }
 
     openTaskDialog(options: TaskDialogOptions = {}): void {
@@ -699,128 +658,5 @@ export default class STMPlugin extends Plugin {
             hotkey: "",
             callback: () => this.exportData(),
         });
-    }
-
-    private buildSetting(): void {
-        const t = this.t;
-        const s = this.store.settings;
-        const setting = new Setting({
-            confirmCallback: () => {
-                void this.saveSettingValues();
-            },
-        });
-
-        const dock = document.createElement("input");
-        dock.type = "checkbox";
-        dock.className = "b3-switch fn__flex";
-        dock.checked = s.dockEnabled;
-        this.settingInputs.dock = dock;
-        setting.addItem({ title: t("settingDock"), actionElement: dock });
-
-        const notifications = document.createElement("input");
-        notifications.type = "checkbox";
-        notifications.className = "b3-switch fn__flex";
-        notifications.checked = s.notifications;
-        this.settingInputs.notifications = notifications;
-        setting.addItem({ title: t("settingNotifications"), actionElement: notifications });
-
-        const reminderTime = document.createElement("input");
-        reminderTime.type = "time";
-        reminderTime.className = "b3-text-field fn__size200";
-        reminderTime.value = s.defaultReminderTime;
-        this.settingInputs.reminderTime = reminderTime;
-        setting.addItem({ title: t("settingReminderTime"), actionElement: reminderTime });
-
-        const dayStart = document.createElement("input");
-        dayStart.type = "time";
-        dayStart.className = "b3-text-field fn__size200";
-        dayStart.value = s.dayStartTime;
-        this.settingInputs.dayStart = dayStart;
-        setting.addItem({ title: t("settingDayStart"), actionElement: dayStart });
-
-        const weekStart = document.createElement("select");
-        weekStart.className = "b3-select fn__size200";
-        weekStart.innerHTML = `<option value="1">${t("weekMonday")}</option><option value="0">${t("weekSunday")}</option>`;
-        weekStart.value = String(s.weekStart);
-        this.settingInputs.weekStart = weekStart;
-        setting.addItem({ title: t("settingWeekStart"), actionElement: weekStart });
-
-        const dateHeadingLevel = document.createElement("select");
-        dateHeadingLevel.className = "b3-select fn__size200";
-        dateHeadingLevel.innerHTML = [1, 2, 3, 4, 5, 6].map(n => `<option value="${n}">H${n}</option>`).join("");
-        dateHeadingLevel.value = String(s.dateHeadingLevel);
-        this.settingInputs.dateHeadingLevel = dateHeadingLevel;
-        setting.addItem({ title: t("settingDateHeadingLevel"), actionElement: dateHeadingLevel });
-
-        const autoTaskFromList = document.createElement("input");
-        autoTaskFromList.type = "checkbox";
-        autoTaskFromList.className = "b3-switch fn__flex";
-        autoTaskFromList.checked = s.autoTaskFromList;
-        this.settingInputs.autoTaskFromList = autoTaskFromList;
-        setting.addItem({ title: t("settingAutoTaskFromList"), actionElement: autoTaskFromList });
-
-        const autoTaskHeadingLevel = document.createElement("select");
-        autoTaskHeadingLevel.className = "b3-select fn__size200";
-        autoTaskHeadingLevel.innerHTML = `<option value="off">${t("autoHeadingOff")}</option><option value="h5">${t("autoHeadingH5")}</option><option value="h6">${t("autoHeadingH6")}</option><option value="both">${t("autoHeadingBoth")}</option>`;
-        autoTaskHeadingLevel.value = s.autoTaskHeadingLevel;
-        this.settingInputs.autoTaskHeadingLevel = autoTaskHeadingLevel;
-        setting.addItem({ title: t("settingAutoTaskHeadingLevel"), actionElement: autoTaskHeadingLevel });
-        setting.addItem({ title: t("settingAutoTaskHint") });
-
-        const calendarColorMode = document.createElement("select");
-        calendarColorMode.className = "b3-select fn__size200";
-        calendarColorMode.innerHTML = `<option value="muted">${t("calendarMuted")}</option><option value="vivid">${t("calendarVivid")}</option>`;
-        calendarColorMode.value = s.calendarColorMode || "muted";
-        this.settingInputs.calendarColorMode = calendarColorMode;
-        setting.addItem({ title: t("settingCalendarColorMode"), actionElement: calendarColorMode });
-
-        const privacyMode = document.createElement("input");
-        privacyMode.type = "checkbox";
-        privacyMode.className = "b3-switch fn__flex";
-        privacyMode.checked = s.privacyMode;
-        this.settingInputs.privacyMode = privacyMode;
-        setting.addItem({ title: t("settingPrivacyMode"), actionElement: privacyMode });
-
-        const showCompleted = document.createElement("input");
-        showCompleted.type = "checkbox";
-        showCompleted.className = "b3-switch fn__flex";
-        showCompleted.checked = s.showCompleted;
-        this.settingInputs.showCompleted = showCompleted;
-        setting.addItem({ title: t("settingShowCompleted"), actionElement: showCompleted });
-
-        const confirmDelete = document.createElement("input");
-        confirmDelete.type = "checkbox";
-        confirmDelete.className = "b3-switch fn__flex";
-        confirmDelete.checked = s.confirmDelete;
-        this.settingInputs.confirmDelete = confirmDelete;
-        setting.addItem({ title: t("settingConfirmDelete"), actionElement: confirmDelete });
-
-        this.setting = setting;
-    }
-
-    private async saveSettingValues(): Promise<void> {
-        const inputs = this.settingInputs;
-        const before = { ...this.store.settings };
-        this.store.updateSettings({
-            dockEnabled: !!inputs.dock?.checked,
-            notifications: !!inputs.notifications?.checked,
-            defaultReminderTime: inputs.reminderTime?.value || "08:00",
-            dayStartTime: inputs.dayStart?.value || "03:00",
-            weekStart: inputs.weekStart?.value === "0" ? 0 : 1,
-            dateHeadingLevel: Math.max(1, Math.min(6, Number(inputs.dateHeadingLevel?.value) || 3)),
-            autoTaskFromList: !!inputs.autoTaskFromList?.checked,
-            autoTaskHeadingLevel: (["h5", "h6", "both"].includes(inputs.autoTaskHeadingLevel?.value || "")
-                ? inputs.autoTaskHeadingLevel!.value
-                : "off") as Settings["autoTaskHeadingLevel"],
-            calendarColorMode: inputs.calendarColorMode?.value === "vivid" ? "vivid" : "muted",
-            privacyMode: !!inputs.privacyMode?.checked,
-            showCompleted: !!inputs.showCompleted?.checked,
-            confirmDelete: !!inputs.confirmDelete?.checked,
-        });
-        await this.store.flush();
-        showMessage(this.t("settingsSaved"), 2000, "info");
-        if (before.dockEnabled !== this.store.settings.dockEnabled) {
-            showMessage(this.t("dockReloadHint"), 4000, "info");
-        }
     }
 }

@@ -3,11 +3,46 @@ import type { Task } from "../types";
 import { api, getBlockRow, getChildBlocks, insertBlock, prependBlock, deleteBlock } from "../api";
 import { bindTaskToBlock } from "./blockBinding";
 
+/** 可选：把普通段落父任务转成 H5/H6 标题；列表项/已有标题不强行转换 */
+export async function convertParentToHeading(store: Store, parent: Task, level: 5 | 6): Promise<boolean> {
+    if (!parent.blockId) return false;
+    const row = await getBlockRow(parent.blockId);
+    if (!row || row.type === "d") return false;
+    try {
+        const data = await api<{ kramdown: string }>("/api/block/getBlockKramdown", { id: parent.blockId });
+        const kramdown = (data?.kramdown || "").replace(/\r?\n\{:[^}]*\}\s*$/, "").trimEnd();
+        if (!kramdown) return false;
+        const lines = kramdown.split(/\r?\n/);
+        const body = lines[0]
+            .replace(/^#{1,6}\s+/, "")
+            .replace(/^-\s*(?:\[[ xX]\]\s*)?/, "");
+        if (!body.trim()) return false;
+        lines[0] = `${"#".repeat(level)} ${body}`;
+        await api("/api/block/updateBlock", {
+            id: parent.blockId,
+            dataType: "markdown",
+            data: lines.join("\n"),
+        });
+        // updateBlock 是异步事务，立即读 blocks 可能还是旧类型；写入成功即可
+        await bindTaskToBlock(parent.id, parent.blockId, parent.startDate);
+        return true;
+    } catch (err) {
+        console.warn("[stm] convert parent task to heading failed", err);
+        return false;
+    }
+}
+
 /** 在父事项块下面创建/追加一个子任务列表，并返回子任务列表项块 ID */
 export async function attachSubtaskBlock(store: Store, parent: Task, child: Task, title: string): Promise<string | null> {
     if (!parent.blockId) return null;
-    const parentRow = await getBlockRow(parent.blockId);
+    let parentRow = await getBlockRow(parent.blockId);
     if (!parentRow || parentRow.type === "d") return null;
+    if (parentRow.type === "p" && store.settings.subtaskParentHeading !== "auto") {
+        const level = store.settings.subtaskParentHeading === "h6" ? 6 : 5;
+        if (await convertParentToHeading(store, parent, level)) {
+            parentRow = (await getBlockRow(parent.blockId)) || parentRow;
+        }
+    }
     const markdown = `- [ ] ${title.replace(/\s+/g, " ").trim()}`;
     let listId = parent.subtaskListId || null;
     let itemId: string | null = null;

@@ -2,52 +2,68 @@
 
 # Task Manager for SiYuan (`sy-task-manage`)
 
-Tasks, projects, calendar, kanban and Gantt — together with your notes.
+Documents, calendar, kanban, table and Gantt — one shared source of tasks.
 
 ![Task Manager](screenshots/overview.png)
 
 ## Quick start
 
 1. **Install** — search for “Task Manager” in the SiYuan marketplace, install and enable it. A task icon appears in the sidebar.
-2. **Create** — click `+` in the sidebar, or use **Block menu → Plugins → Set as task** in a document.
-3. **Switch views** — use the bottom bar to open Kanban, Calendar or Gantt. Everything stays in sync.
+2. **Create** — use quick add in the sidebar, or click `+` for all fields; you can also use **Block menu → Plugins → Set as task** in a document.
+3. **Switch views** — use the bottom bar to open Kanban, Calendar, Gantt or Table.
 
-> Type `@` in a document to mention Mankeep contacts; type `@today`, `@tomorrow` or `@2026-11-18` to insert a date heading.
+> Quick add only creates a task. Use `+` when you need a project, note or document binding.
 
-## Document, calendar, kanban and Gantt — the same task
+## The document is the source
 
-**Change it anywhere; everything updates.**
-
-Tasks are bound to blocks in your document. The document is the source of truth; calendar, kanban and Gantt are views of the same data:
+Tasks are bound to document blocks. Document, calendar, kanban, table and Gantt are different entries to the same task data:
 
 - A task block under a date heading appears on that date in the calendar
-- Dragging a task in the calendar moves its block to the new date heading
-- Renaming, moving or deleting a block updates every view
+- Dragging a task in the calendar moves the block to the new date heading
+- Editing, moving or deleting a bound block updates every view
 
-<p align="center"><img src="screenshots/document-sync.png" width="90%" alt="Document, calendar, kanban and Gantt stay in sync"></p>
+<p align="center"><img src="screenshots/document-sync.png" width="90%" alt="Document and views stay in sync"></p>
 
-## Four views, one source of data
+## Multiple views, one data set
 
 <p align="center"><img src="screenshots/four-views.png" width="92%" alt="Document, calendar, kanban and Gantt"></p>
 
+| View | Best for |
+| --- | --- |
+| Calendar | Schedule by date, drag to reschedule, select multiple days |
+| Kanban | Move tasks through todo / doing / done / abandoned |
+| Table | See fields together, multi-select and bulk changes |
+| Gantt | Project timeline and multi-day planning |
+
 ## Features
 
+### Core
+
 - **Tasks and projects** — create, edit, complete, abandon and search tasks; group projects by category.
-- **Quick add** — type a title in the sidebar and press Enter; natural dates such as “tomorrow 10:00” are supported.
-- **Table view** — manage tasks in a table with multi-select, bulk complete/reopen, bulk project/date changes and bulk delete.
-- **Subtasks** — add subtasks inside a task with progress; when the parent is bound to a document block, subtasks become a task list under the parent block and stay in sync with document checkboxes.
-- **Block binding** — bind any block to a task. Editing the bound block or moving it under another date heading updates the task and all views.
-- **Document integration** — calendar/kanban task creation writes a block under the date heading; deleting a task cleans up its block and empty headings.
-- **Calendar** — month, week and list views; lunar dates; drag to reschedule, resize multi-day tasks, complete from an event.
-- **Kanban** — todo / doing / done / abandoned columns with category and project filters.
-- **Gantt** — timeline with search, sort, status, project/category and completion filters; drag bars to shift dates.
-- **Auto calendar** — new checklist items under a date heading become tasks automatically; H5/H6 headings can be enabled in settings.
-- **Reminders** — on time, 5/10/15/30 minutes before, or 1/2 hours before; notifications are de-duplicated per day.
+- **Document integration** — bind any block as a task; title edits, block moves and deletes update every view; creating from calendar/kanban writes into the project document.
+- **Subtasks** — add subtasks with progress; when the parent is bound, they become a task list under the parent block and stay in sync with document checkboxes.
+- **Quick add** — type a title and press Enter; natural dates such as “tomorrow 10:00” are supported.
+- **Auto collection** — new task-list items under a date heading can become tasks automatically; H5/H6 heading collection is optional.
+
+### Views
+
+- **Calendar** — month/week/list; lunar dates; drag to reschedule, resize multi-day tasks, complete from an event.
+- **Kanban** — four columns with drag-and-drop status changes, category and project filters.
+- **Table** — multi-select, bulk complete/reopen, bulk project/date changes and bulk delete.
+- **Gantt** — search, sort, status and completion filters; drag bars to shift dates.
+
+### Productivity
+
+- **Reminders** — on time, 5/10/15/30 minutes before, or 1/2 hours before; in-app feedback plus a system notification attempt. Catch-up after long periods offline is limited.
 - **Pomodoro** — 25-minute focus sessions with automatic 5/15-minute breaks, pause/resume and per-task counts.
-- **Statistics** — a “Statistics” entry in the sidebar with task, project and pomodoro summaries; task completion and pomodoro heatmaps support 30 days, 90 days, 6 months and 12 months, default to 12 months, and can be filtered by project.
+- **Statistics** — task, project and pomodoro summaries; task-completion and pomodoro heatmaps support 30 days, 90 days, 6 months and 12 months, default to 12 months, and can be filtered by project.
 - **Repeating tasks** — daily, weekly, monthly or yearly with interval and end date.
-- **Import/export** — JSON backup and legacy task-plugin import.
-- **Privacy mode** — masks task and project names in calendar and kanban.
+
+### Data and display
+
+- **Import/export** — JSON backup and restore; legacy task-plugin import is supported.
+- **Privacy mode** — masks task and project names in calendar and kanban; the sidebar and table still show plain text.
+- **Settings** — click the gear in the sidebar, or the settings gear on the marketplace plugin card.
 
 ## Installation
 
@@ -69,7 +85,9 @@ Then enable the plugin in *Settings → Marketplace → Downloaded*.
 
 ### Create a task
 
-Use the sidebar `+`, calendar, kanban, or **Block menu → Plugins → Set as task** in a document.
+- **Quick add** — type a title in the sidebar and press Enter; creates a task only
+- **Full create** — click `+` to set project, date, time, reminder and note
+- **From a document** — use **Block menu → Plugins → Set as task** to bind the task to that block
 
 ### Bind a document block
 
@@ -77,19 +95,23 @@ Click a task title to jump to its block; click elsewhere in the row to edit. Tas
 
 ### Switch views
 
-- **Calendar** — month, week and list views; drag to reschedule or select multiple days.
-- **Kanban** — drag cards between statuses; filter by project or category.
-- **Gantt** — view the project timeline and drag bars to move dates.
+- **Calendar** — month, week and list; drag to reschedule or select multiple days
+- **Kanban** — drag cards between statuses; filter by project or category
+- **Table** — multi-select and bulk complete, reopen, change project/date or delete
+- **Gantt** — view the timeline and drag bars to move dates
 
-### Reminders and Pomodoro
+### Subtasks
 
-Set start/end time and a reminder offset while creating or editing a task. Hover a task row to start a Pomodoro.
+Add subtasks in the task dialog. When the parent is bound to a document block, subtasks become a task list in the document and checkboxes sync both ways.
 
-### Document mentions
+Settings → Tasks & documents → Subtask parent style supports Auto, H5 or H6; the H5/H6 buttons in the subtask section convert only the current parent.
 
-- `@name` — insert a contact link
-- `@today` / `@tomorrow` / `@2026-11-18` — insert a date heading
-- After inserting a date heading with `@date`, the mention text is removed automatically
+### Reminders, Pomodoro and document mentions
+
+- Set start/end time and a reminder offset while creating or editing a task
+- Hover a task row to start a Pomodoro
+- Type `@name` in a document to insert a contact link
+- Type `@today` / `@tomorrow` / `@2026-11-18` to insert a date heading; the typed `@date` text is removed automatically
 
 ## Use with Mankeep
 
@@ -108,7 +130,7 @@ The two plugins are designed to work together and are recommended as a pair.
 
 ## Data
 
-Tasks, projects and settings are stored in SiYuan's plugin data directory. JSON import/export is available for backup and migration.
+Tasks, projects and settings are stored in SiYuan's plugin data directory. Use **Settings → Data** to import/export JSON or import legacy task-plugin data.
 
 ## License
 

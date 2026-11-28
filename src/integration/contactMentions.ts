@@ -21,11 +21,13 @@ export function stripBlockAttrs(kramdown: string): string {
     return kramdown.replace(/\r?\n\{:[^}]*\}\s*$/, "").trimEnd();
 }
 
-/** 联系人提及使用普通链接，避免块引用自带的文档图标造成识别异常 */
+/** 旧版本的联系人链接协议，仅用于迁移历史数据 */
 const LINK_PREFIX = "siyuan://plugins/sy-task-manage/contact/";
 
+/** 使用真正的思源块引用，Mankeep 等插件可以通过 refs 统计反向链接。 */
 export function mentionLink(contactId: string, name: string): string {
-    return `[@${name}](${LINK_PREFIX}${contactId})`;
+    const safeName = name.replace(/"/g, "'").replace(/\r?\n/g, " ");
+    return `((${contactId} "@${safeName}"))`;
 }
 
 /** 匹配正文里的纯文本 @姓名，避开链接标签和已经转换过的引用 */
@@ -34,7 +36,7 @@ export function plainMentionPattern(name: string): RegExp {
     return new RegExp(`(?<![\\w"@\\[])@${n}(?![\\w"\\u4e00-\\u9fa5\\]])`, "g");
 }
 
-/** 把块引用或旧链接统一替换为普通链接，并更新名字 */
+/** 把旧链接或已有块引用统一替换为联系人块引用，并更新显示名字 */
 export function replaceMentionAnchor(kramdown: string, contactId: string, newName: string): string {
     const id = escapeRegex(contactId);
     const icon = `(?:<span data-type="text">📄</span>\u200b?)?`;
@@ -85,7 +87,7 @@ class ContactMentionRegistry {
             const current = contacts.find(c => c.id === ref.contactId);
             if (current && current.name !== ref.name) this.lastNames.set(ref.contactId, ref.name);
         }
-        await this.migrateRegistryToLinks();
+        await this.migrateRegistryToRefs();
         await this.sync(true);
         this.installLinkHandler();
         this.timer = window.setInterval(() => void this.sync(true), SYNC_MS);
@@ -302,8 +304,8 @@ class ContactMentionRegistry {
         }
     }
 
-    /** 把注册表里仍然存在的块引用统一换成普通链接，去掉文档图标 */
-    private async migrateRegistryToLinks(): Promise<void> {
+    /** 把注册表里的历史链接统一换成联系人块引用 */
+    private async migrateRegistryToRefs(): Promise<void> {
         const seen = new Set<string>();
         for (const ref of this.items) {
             if (seen.has(ref.blockId)) continue;

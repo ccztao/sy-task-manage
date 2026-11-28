@@ -200,7 +200,13 @@ export class KanbanView {
         const children = this.plugin.store.tasks.filter(x => x.parentId === task.id);
         if (children.length) {
             const doneCount = children.filter(x => !!x.completedAt).length;
-            card.append(h("div", { class: "stm-card-subtasks", text: `☑ ${doneCount}/${children.length}` }));
+            const percent = Math.round((doneCount / children.length) * 100);
+            const badge = h("div", { class: "stm-card-subtasks" }, [
+                h("span", { class: "stm-subtask-ring" }),
+                h("span", { text: `${doneCount}/${children.length}` }),
+            ]);
+            badge.style.setProperty("--stm-subtask-progress", `${percent}%`);
+            card.append(badge);
         }
         if (task.completedAt) {
             card.append(h("span", { class: "stm-card-done-badge", text: t("completedBadge") }));

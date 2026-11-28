@@ -88,6 +88,8 @@ export interface Settings {
     dateHeadingLevel: number;
     autoTaskFromList: boolean;
     autoTaskHeadingLevel: AutoTaskHeadingLevel;
+    /** 添加子任务时父任务块的标题级别：auto 保持原样 */
+    subtaskParentHeading: "auto" | "h5" | "h6";
     calendarColorMode: "muted" | "vivid";
     privacyMode: boolean;
     weekStart: 0 | 1;
@@ -104,6 +106,7 @@ export const DEFAULT_SETTINGS: Settings = {
     dateHeadingLevel: 3,
     autoTaskFromList: true,
     autoTaskHeadingLevel: "off",
+    subtaskParentHeading: "auto",
     calendarColorMode: "muted",
     privacyMode: false,
     weekStart: 1,

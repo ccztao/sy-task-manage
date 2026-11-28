@@ -81,21 +81,8 @@ export class TaskPanel {
 
         this.addBtn = h("button", { class: "stm-icon-btn", title: t("newTask"), html: icon("plus", 18) });
         this.addBtn.addEventListener("click", () => this.onAdd());
-        const moreBtn = h("button", { class: "stm-icon-btn", title: t("more"), html: icon("more", 18) });
-        moreBtn.addEventListener("click", ev => {
-            ev.stopPropagation();
-            const rect = moreBtn.getBoundingClientRect();
-            showMenu(
-                [
-                    menuItem(t("statistics"), "iconChart", () => this.plugin.openStatistics()),
-                    menuItem(t("importData"), "iconDownload", () => this.plugin.openImportDialog()),
-                    menuItem(t("importLegacy"), "iconDownload", () => void this.plugin.openLegacyImport()),
-                    menuItem(t("exportData"), "iconUpload", () => this.plugin.exportData()),
-                    menuItem(t("settings"), "iconSettings", () => this.plugin.openSettings()),
-                ],
-                { x: rect.right, y: rect.bottom }
-            );
-        });
+        const settingsBtn = h("button", { class: "stm-icon-btn", title: t("settings"), html: icon("settings", 17) });
+        settingsBtn.addEventListener("click", () => this.plugin.openSettings());
 
         const statsBtn = h("button", {
             class: "stm-stats-entry",
@@ -106,7 +93,7 @@ export class TaskPanel {
         const header = h("div", { class: "stm-header" }, [
             statsBtn,
             switchEl,
-            h("div", { class: "stm-header-actions" }, [this.addBtn, moreBtn]),
+            h("div", { class: "stm-header-actions" }, [this.addBtn, settingsBtn]),
         ]);
 
         this.filtersEl = h("div", { class: "stm-filters" });
@@ -424,7 +411,16 @@ export class TaskPanel {
         const children = this.plugin.store.tasks.filter(x => x.parentId === task.id);
         if (children.length) {
             const doneChildren = children.filter(x => !!x.completedAt).length;
-            meta.push(h("span", { class: "stm-subtask-badge", text: `☑ ${doneChildren}/${children.length}` }));
+            const percent = Math.round((doneChildren / children.length) * 100);
+            const badge = h("span", {
+                class: "stm-subtask-badge",
+                title: `${t("subtasks")} ${doneChildren}/${children.length}`,
+            }, [
+                h("span", { class: "stm-subtask-ring" }),
+                h("span", { text: `${doneChildren}/${children.length}` }),
+            ]);
+            badge.style.setProperty("--stm-subtask-progress", `${percent}%`);
+            meta.push(badge);
         }
         if (item.done) meta.push(h("span", { class: "stm-done-badge", text: t("completedBadge") }));
         if (project) {

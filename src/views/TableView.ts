@@ -169,6 +169,17 @@ export class TableView {
                 this.render();
             });
             const title = h("td", { class: "stm-table-title", text: privacy ? maskText(task.title) : task.title });
+            const children = store.tasks.filter(x => x.parentId === task.id);
+            if (children.length) {
+                const doneChildren = children.filter(x => !!x.completedAt).length;
+                const percent = Math.round((doneChildren / children.length) * 100);
+                const badge = h("span", { class: "stm-table-progress" }, [
+                    h("span", { class: "stm-subtask-ring" }),
+                    h("span", { text: `${doneChildren}/${children.length}` }),
+                ]);
+                badge.style.setProperty("--stm-subtask-progress", `${percent}%`);
+                title.append(badge);
+            }
             if (task.blockId) title.append(h("span", { class: "stm-table-link", html: icon("link", 11) }));
             const date = h("td", { class: "stm-table-date", text: task.startDate ? `${formatDateHuman(task.startDate, today)}${task.startTime ? ` ${task.startTime}` : ""}` : "—" });
             const projectCell = h("td");
